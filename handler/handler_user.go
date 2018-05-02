@@ -40,5 +40,15 @@ func CreateUser(c *gin.Context) {
 
 // UserInfo User Info
 func UserInfo(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": "user"})
+
+	_userid := c.Params.ByName("userid")
+
+	user, err := persist.GetPersist().UserInfo(_userid)
+
+	if err != nil {
+		c.JSON(422, gin.H{"errcode": 1, "msg": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": user})
 }

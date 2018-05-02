@@ -5,31 +5,36 @@ import (
 
 	"github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
+
+	"github.com/Eric-GreenComb/x-server/persist"
 )
 
 // AuthMiddleware the jwt middleware
 var AuthMiddleware jwt.GinJWTMiddleware
 
-// LoadJWT load jwt
-func LoadJWT() jwt.GinJWTMiddleware {
+// LoadAuthMiddleware load jwt
+func LoadAuthMiddleware() jwt.GinJWTMiddleware {
 	return jwt.GinJWTMiddleware{
 		Realm:      "FiFu.io Blockchain",
 		Key:        []byte("fifu.io blockchain"),
 		Timeout:    time.Hour,
 		MaxRefresh: time.Hour,
 		Authenticator: func(userId string, password string, c *gin.Context) (string, bool) {
-			if (userId == "admin" && password == "admin") || (userId == "test" && password == "test") {
-				return userId, true
+
+			user, err := persist.GetPersist().Login(userId, password)
+			if err != nil {
+				return userId, false
 			}
 
-			return userId, false
+			return user.UserID, true
 		},
 		Authorizator: func(userId string, c *gin.Context) bool {
-			if userId == "admin" {
-				return true
-			}
+			return true
+			// if userId == "admin" {
+			// 	return true
+			// }
 
-			return false
+			// return false
 		},
 		Unauthorized: func(c *gin.Context, code int, message string) {
 			c.JSON(code, gin.H{

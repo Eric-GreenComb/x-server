@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/sync/errgroup"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -52,7 +51,7 @@ func main() {
 
 	router.Use(Cors())
 
-	AuthMiddleware = LoadJWT()
+	AuthMiddleware = LoadAuthMiddleware()
 
 	/* api base */
 	r0 := router.Group("/")
@@ -67,14 +66,15 @@ func main() {
 	r1 := router.Group("/api/v1")
 	{
 		r1.POST("/users/create", handler.CreateUser)
-		r1.GET("/user/:userid", handler.UserInfo)
+		r1.GET("/users/:userid", handler.UserInfo)
 	}
 
 	// auth api
 	r2 := router.Group("/api/auth/v1")
 	r2.Use(AuthMiddleware.MiddlewareFunc())
 	{
-		r2.GET("/hello", helloHandler)
+		r2.GET("/hello", handler.GetHello)
+		r2.POST("/hello", handler.PostHello)
 		r2.GET("/refresh_token", AuthMiddleware.RefreshHandler)
 	}
 
@@ -94,12 +94,4 @@ func main() {
 	if err := g.Wait(); err != nil {
 		log.Fatal(err)
 	}
-}
-
-func helloHandler(c *gin.Context) {
-	claims := jwt.ExtractClaims(c)
-	c.JSON(200, gin.H{
-		"userID": claims["id"],
-		"text":   "Hello World.",
-	})
 }
