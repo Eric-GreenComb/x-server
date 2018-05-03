@@ -12,6 +12,34 @@ curl -s -X POST http://localhost:8080/api/v1/users/create -d 'userID=13810167616
 
 curl http://localhost:8080/api/v1/users/13810167616
 
+## token
+
+- deploy token /token/deploy/:name/:symbol/:keystore/:pwd
+
+curl -s -X POST http://localhost:8080/api/v1/token/deploy -d 'name=fifu&symbol=FIFU&keystore=/home/eric/go/src/github.com/Eric-GreenComb/parity-poa/parity0/keys/FiFuPoA/UTC--2018-05-03T08-41-40.750244197Z--87163ed732947d8e400ebc2772f1f1837b5e0ffa&pwd=a11111'
+
+- balance /token/balance
+
+http://localhost:8080/api/v1/token/balance?conaddr=0xfBE97c0324C44824F1d1c26669Dc590162cB9f16&addr=0x87163ED732947D8E400eBC2772F1F1837B5e0Ffa
+
+- transfer /token/transfer
+
+curl -s -X POST http://localhost:8080/api/v1/token/transfer -d 'conaddr=0xfBE97c0324C44824F1d1c26669Dc590162cB9f16&to=0xeca4635f3fE81b4b8Cc6d40deFf99Eb8428C7BeD&keystore=/home/eric/go/src/github.com/Eric-GreenComb/parity-poa/parity0/keys/FiFuPoA/UTC--2018-05-03T08-41-40.750244197Z--87163ed732947d8e400ebc2772f1f1837b5e0ffa&amount=1000&pwd=a11111'
+
+## badger
+
+- SetBadgerKey /badger/set/:key/:value
+
+curl -s -X POST http://localhost:8080/api/v1/badger/set/name/eric
+
+- SetBadgerKeyTTL /badger/setwithttl/:key/:value
+
+curl -s -X POST http://localhost:8080/api/v1/badger/setwithttl/name/eric/5
+
+- GetBadgerKey /badger/get/:key
+
+curl http://localhost:8080/api/v1/badger/get/name
+
 ## jwt
 
 - Login API:

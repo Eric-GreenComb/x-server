@@ -10,6 +10,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 
 	"github.com/Eric-GreenComb/x-server/config"
+	"github.com/Eric-GreenComb/x-server/ether"
 	"github.com/Eric-GreenComb/x-server/handler"
 	"github.com/Eric-GreenComb/x-server/persist"
 )
@@ -24,6 +25,8 @@ func main() {
 	}
 
 	persist.InitDatabase()
+
+	ether.LoadEthClient()
 
 	router := gin.Default()
 
@@ -42,11 +45,19 @@ func main() {
 		r0.POST("login", Login)
 	}
 
-	// user api
+	// api
 	r1 := router.Group("/api/v1")
 	{
 		r1.POST("/users/create", handler.CreateUser)
 		r1.GET("/users/:userid", handler.UserInfo)
+
+		r1.POST("/token/deploy", handler.DeployToken)
+		r1.GET("/token/balance", handler.BalanceOfToken)
+		r1.POST("/token/transfer", handler.TransferToken)
+
+		r1.POST("/badger/set/:key/:value", handler.SetBadgerKey)
+		r1.POST("/badger/setwithttl/:key/:value", handler.SetBadgerKeyTTL)
+		r1.GET("/badger/get/:key", handler.GetBadgerKey)
 	}
 
 	// auth api
