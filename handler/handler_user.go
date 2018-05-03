@@ -7,13 +7,9 @@ import (
 
 	"github.com/Eric-GreenComb/x-server/bean"
 	"github.com/Eric-GreenComb/x-server/persist"
+	"github.com/Eric-GreenComb/x-server/regexp"
 	"github.com/gin-gonic/gin"
 )
-
-// Login Login
-func Login(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"errcode": 0, "token": "token"})
-}
 
 // CreateUser Create User
 func CreateUser(c *gin.Context) {
@@ -23,6 +19,11 @@ func CreateUser(c *gin.Context) {
 
 	if user.UserID == "" || user.Passwd == "" || user.Name == "" {
 		c.JSON(422, gin.H{"errcode": 1, "msg": "There are some empty fields."})
+		return
+	}
+
+	if !regexp.IsMobile(user.UserID) {
+		c.JSON(422, gin.H{"errcode": 1, "msg": "UserID must phone number."})
 		return
 	}
 

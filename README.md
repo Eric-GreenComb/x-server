@@ -16,14 +16,14 @@ curl http://localhost:8080/api/v1/users/13810167616
 
 - Login API:
 
-http -v --json POST localhost:8080/login username=13810167616 password=0fb6c6c0b7621fb7bd6ff1e6fb656bc746e2254a4f671dee25c0ce3ddd9ccf3e
+http -v --json POST localhost:8080/login userID=13810167616 passwd=0fb6c6c0b7621fb7bd6ff1e6fb656bc746e2254a4f671dee25c0ce3ddd9ccf3e
 
 - Refresh token API:
 
-http -v -f GET localhost:8080/api/auth/v1/refresh_token "Authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MjUyNTA0NTUsImlkIjoiMTM4MTAxNjc2MTYiLCJvcmlnX2lhdCI6MTUyNTI0Njg1NX0.5Te4JxQ3Dmb6SsjBrzNe56gyQi8fO3NzPlvvqGOgd3Y"  "Content-Type: application/json"
+http -v -f GET localhost:8080/api/auth/v1/refresh_token "Authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MjUzMzM3MjQsImlhdCI6MTUyNTMzMDEyNCwic3ViIjoiMTM4MTAxNjc2MTYifQ.FG7PTl4QBhJ8VJxEB3Q94x7smPSygMZoY6zQQWDiZQs"  "Content-Type: application/json"
 
 - Hello world
 
-http -f GET localhost:8080/api/auth/v1/hello "Authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MjUyNTA0NTUsImlkIjoiMTM4MTAxNjc2MTYiLCJvcmlnX2lhdCI6MTUyNTI0Njg1NX0.5Te4JxQ3Dmb6SsjBrzNe56gyQi8fO3NzPlvvqGOgd3Y" "Content-Type: application/json"
+http -f GET localhost:8080/api/auth/v1/hello "Authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MjUzMzM3MjQsImlhdCI6MTUyNTMzMDEyNCwic3ViIjoiMTM4MTAxNjc2MTYifQ.FG7PTl4QBhJ8VJxEB3Q94x7smPSygMZoY6zQQWDiZQs" "Content-Type: application/json"
 
-http -v --json POST localhost:8080/api/auth/v1/hello "Authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MjUyNTA0NTUsImlkIjoiMTM4MTAxNjc2MTYiLCJvcmlnX2lhdCI6MTUyNTI0Njg1NX0.5Te4JxQ3Dmb6SsjBrzNe56gyQi8fO3NzPlvvqGOgd3Y"
+http -v --json POST localhost:8080/api/auth/v1/hello "Authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MjUzMzM3MjQsImlhdCI6MTUyNTMzMDEyNCwic3ViIjoiMTM4MTAxNjc2MTYifQ.FG7PTl4QBhJ8VJxEB3Q94x7smPSygMZoY6zQQWDiZQs"
