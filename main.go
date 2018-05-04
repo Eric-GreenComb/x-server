@@ -51,6 +51,9 @@ func main() {
 		r1.POST("/users/create", handler.CreateUser)
 		r1.GET("/users/:userid", handler.UserInfo)
 
+		r1.POST("/account/create/:userid/:password", handler.CreateAccount)
+		r1.GET("/account/info/:address", handler.GetKeystore)
+
 		r1.POST("/token/deploy", handler.DeployToken)
 		r1.GET("/token/balance", handler.BalanceOfToken)
 		r1.POST("/token/transfer", handler.TransferToken)

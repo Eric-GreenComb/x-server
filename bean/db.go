@@ -45,7 +45,7 @@ type Users struct {
 // Addresses Addresses
 type Addresses struct {
 	gorm.Model
-	UserID   string `gorm:";unique" form:"userID" json:"userID"`      // 手机号码
-	Address  string `gorm:"not null" form:"address" json:"address"`   // 用户地址
-	KeyStore string `gorm:"not null" form:"keystore" json:"keystore"` // 用户keystore
+	Address  string `gorm:";unique" form:"address" json:"address"`             // 用户地址
+	UserID   string `gorm:"not null" form:"userID" json:"userID"`              // 手机号码
+	KeyStore string `gorm:"size:600;not null" form:"keystore" json:"keystore"` // 用户keystore
 }

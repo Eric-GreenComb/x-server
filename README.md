@@ -12,6 +12,18 @@ curl -s -X POST http://localhost:8080/api/v1/users/create -d 'userID=13810167616
 
 curl http://localhost:8080/api/v1/users/13810167616
 
+## account
+
+- create account /account/create/:userid/:password
+
+curl -s -X POST http://localhost:8080/api/v1/account/create/13810167616/a11111
+
+return 0x3c5ffa487ea89a36d3f05166bba15b959e315a59
+
+- get account /account/info/:address
+
+curl http://localhost:8080/api/v1/account/info/0x3c5ffa487ea89a36d3f05166bba15b959e315a59
+
 ## token
 
 - deploy token /token/deploy/:name/:symbol/:keystore/:pwd

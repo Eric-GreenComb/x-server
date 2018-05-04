@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/Eric-GreenComb/x-server/bean"
 	"github.com/Eric-GreenComb/x-server/persist"
 	"github.com/Eric-GreenComb/x-server/regexp"
-	"github.com/gin-gonic/gin"
 )
 
 // CreateUser Create User
