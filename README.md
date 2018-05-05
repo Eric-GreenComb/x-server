@@ -26,17 +26,19 @@ curl http://localhost:8080/api/v1/account/info/0x3c5ffa487ea89a36d3f05166bba15b9
 
 ## token
 
-- deploy token /token/deploy/:name/:symbol/:keystore/:pwd
+- deploy token /token/deploy/:name/:symbol/:address/:pwd
 
-curl -s -X POST http://localhost:8080/api/v1/token/deploy -d 'name=fifu&symbol=FIFU&keystore=/home/eric/go/src/github.com/Eric-GreenComb/parity-poa/parity0/keys/FiFuPoA/UTC--2018-05-03T08-41-40.750244197Z--87163ed732947d8e400ebc2772f1f1837b5e0ffa&pwd=a11111'
+curl -s -X POST http://localhost:8080/api/v1/token/deploy -d 'name=fifu&symbol=FIFU&address=0x3c5ffa487ea89a36d3f05166bba15b959e315a59&pwd=a11111'
+
+return 0x09e86ffe4333212f20f7ec958a166e8fdb0c6aa5
 
 - balance /token/balance
 
-http://localhost:8080/api/v1/token/balance?conaddr=0xfBE97c0324C44824F1d1c26669Dc590162cB9f16&addr=0x87163ED732947D8E400eBC2772F1F1837B5e0Ffa
+http://localhost:8080/api/v1/token/balance?conaddr=0x09e86ffe4333212f20f7ec958a166e8fdb0c6aa5&addr=0x3c5ffa487ea89a36d3f05166bba15b959e315a59
 
 - transfer /token/transfer
 
-curl -s -X POST http://localhost:8080/api/v1/token/transfer -d 'conaddr=0xfBE97c0324C44824F1d1c26669Dc590162cB9f16&to=0xeca4635f3fE81b4b8Cc6d40deFf99Eb8428C7BeD&keystore=/home/eric/go/src/github.com/Eric-GreenComb/parity-poa/parity0/keys/FiFuPoA/UTC--2018-05-03T08-41-40.750244197Z--87163ed732947d8e400ebc2772f1f1837b5e0ffa&amount=1000&pwd=a11111'
+curl -s -X POST http://localhost:8080/api/v1/token/transfer -d 'conaddr=0x09e86ffe4333212f20f7ec958a166e8fdb0c6aa5&from=0x3c5ffa487ea89a36d3f05166bba15b959e315a59&to=0xeca4635f3fE81b4b8Cc6d40deFf99Eb8428C7BeD&amount=1000&pwd=a11111'
 
 ## badger
 

@@ -62,7 +62,7 @@ func GetKeystore(c *gin.Context) {
 
 	_keystore, err := persist.GetPersist().AddressInfo(_address)
 	if err != nil {
-		c.JSON(200, gin.H{"errcode": 1, "msg": "create address error"})
+		c.JSON(200, gin.H{"errcode": 1, "msg": "get address error"})
 		return
 	}
 

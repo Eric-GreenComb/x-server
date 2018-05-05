@@ -52,6 +52,7 @@ func main() {
 		r1.GET("/users/:userid", handler.UserInfo)
 
 		r1.POST("/account/create/:userid/:password", handler.CreateAccount)
+		// r1.POST("/account/load/:keystore", handler.LoadKeystore)
 		r1.GET("/account/info/:address", handler.GetKeystore)
 
 		r1.POST("/token/deploy", handler.DeployToken)
