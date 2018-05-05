@@ -32,9 +32,13 @@ curl -s -X POST http://localhost:8080/api/v1/token/deploy -d 'name=fifu&symbol=F
 
 return 0x09e86ffe4333212f20f7ec958a166e8fdb0c6aa5
 
-- balance /token/balance
+0x70066930c500dbc07517b11e0393dc260f7296db
 
-http://localhost:8080/api/v1/token/balance?conaddr=0x09e86ffe4333212f20f7ec958a166e8fdb0c6aa5&addr=0x3c5ffa487ea89a36d3f05166bba15b959e315a59
+- balance /token/balance/:addr
+
+curl -s -X POST http://localhost:8080/api/v1/token/balance/0x3c5ffa487ea89a36d3f05166bba15b959e315a59 -d 'conaddrs=0x09e86ffe4333212f20f7ec958a166e8fdb0c6aa5,0x70066930c500dbc07517b11e0393dc260f7296db'
+
+curl -s -X POST http://localhost:8080/api/v1/token/balance/0xeca4635f3fE81b4b8Cc6d40deFf99Eb8428C7BeD -d 'conaddrs=0x09e86ffe4333212f20f7ec958a166e8fdb0c6aa5,0x70066930c500dbc07517b11e0393dc260f7296db'
 
 - transfer /token/transfer
 

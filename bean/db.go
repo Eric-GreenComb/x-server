@@ -30,7 +30,19 @@ type Tokens struct {
 	Total   uint64 `gorm:"not null" form:"total" json:"total"`     // Token合约total
 	Desc    string `gorm:"not null" form:"desc" json:"desc"`       // Token合约描述
 	Owner   string `gorm:"not null" form:"owner" json:"owner"`     // Token合约发行者
+	Weight  int    `gorm:"not null" form:"weight" json:"weight"`   // Token合约权重
 	Status  int8   `gorm:"not null" form:"status" json:"status"`   // Token合约状态
+}
+
+// TokenTransfer TokenTransfer
+type TokenTransfer struct {
+	gorm.Model
+	Address string `gorm:"not null" form:"address" json:"address"` // Token合约地址
+	Type    int8   `gorm:"not null" form:"type" json:"type"`       // loan,transfer,recharge,withdraw
+	From    string `gorm:"default:''" form:"from" json:"from"`
+	To      string `gorm:"default:''" form:"to" json:"to"`
+	Amount  uint64 `gorm:"not null" form:"amount" json:"amount"`
+	Memo    string `gorm:"default:''" form:"memo" json:"memo"` // coinbase,mint,transfer,recharge,withdraw
 }
 
 // Users Users

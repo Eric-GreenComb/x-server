@@ -8,6 +8,8 @@ server:
   mode: debug  # debug;release
   gorm:
     LogMode: false # db log
+  view:
+    limit: 10  
 
 ###############################################################################
 #

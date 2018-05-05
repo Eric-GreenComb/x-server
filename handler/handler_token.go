@@ -11,6 +11,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/gin-gonic/gin"
 
+	"github.com/Eric-GreenComb/x-server/bean"
 	"github.com/Eric-GreenComb/x-server/ether"
 	"github.com/Eric-GreenComb/x-server/persist"
 	"github.com/Eric-GreenComb/x-server/token"
@@ -51,20 +52,31 @@ func DeployToken(c *gin.Context) {
 // BalanceOfToken BalanceOfToken
 func BalanceOfToken(c *gin.Context) {
 
-	_conaddr, _ := c.GetQuery("conaddr")
-	_addr, _ := c.GetQuery("addr")
+	_addr := c.Params.ByName("addr")
+	_conaddrs := c.PostForm("conaddrs")
 
-	_caller, err := token.NewHumanStandardTokenCaller(common.HexToAddress(_conaddr), ether.GetEthClient())
-	if err != nil {
-		c.String(200, err.Error())
-		return
+	split := strings.Split(_conaddrs, ",")
+
+	var tokenValues []bean.TokenValue
+	for _, _conaddr := range split {
+
+		_caller, err := token.NewHumanStandardTokenCaller(common.HexToAddress(_conaddr), ether.GetEthClient())
+		if err != nil {
+			continue
+		}
+		_bigint, err := _caller.BalanceOf(&bind.CallOpts{Pending: true}, common.HexToAddress(_addr))
+		if err != nil {
+			continue
+		}
+
+		var tokenValue bean.TokenValue
+		tokenValue.Address = _conaddr
+		tokenValue.Balance = _bigint.String()
+
+		tokenValues = append(tokenValues, tokenValue)
 	}
-	_bigint, err := _caller.BalanceOf(&bind.CallOpts{Pending: true}, common.HexToAddress(_addr))
-	if err != nil {
-		c.String(200, err.Error())
-		return
-	}
-	c.JSON(200, _bigint.String())
+
+	c.JSON(200, tokenValues)
 }
 
 // TransferToken TransferToken
@@ -107,4 +119,98 @@ func TransferToken(c *gin.Context) {
 		"to":     _to,
 		"amount": _amount,
 	})
+}
+
+// CreateToken CreateToken
+func CreateToken(c *gin.Context) {
+
+	var _tokens bean.Tokens
+	c.Bind(&_tokens)
+
+	err := persist.GetPersist().CreateToken(_tokens)
+	if err != nil {
+		c.JSON(200, gin.H{"errcode": 1, "msg": "create token error"})
+		return
+	}
+
+	c.JSON(200, _tokens)
+}
+
+// TokenInfo TokenInfo
+func TokenInfo(c *gin.Context) {
+
+	_address := c.Params.ByName("address")
+
+	token, err := persist.GetPersist().TokenInfo(_address)
+
+	if err != nil {
+		c.JSON(422, gin.H{"errcode": 1, "msg": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": token})
+}
+
+// UpdateTokenWeight UpdateTokenWeight
+func UpdateTokenWeight(c *gin.Context) {
+	_address := c.Params.ByName("address")
+	_weight := c.Params.ByName("weight")
+	if _address == "" || _weight == "" {
+		c.JSON(422, gin.H{"errcode": 1, "msg": "There are some empty fields."})
+		return
+	}
+
+	_iWeight, err := strconv.Atoi("_weight")
+	if err != nil {
+		c.JSON(422, gin.H{"errcode": 1, "msg": err.Error()})
+		return
+	}
+
+	if err := persist.GetPersist().UpdateTokenWeight(_address, _iWeight); err != nil {
+		c.JSON(406, gin.H{"errcode": 1, "msg": "update weight error."})
+	} else {
+		c.JSON(200, gin.H{"errcode": 0, "msg": "success"})
+	}
+}
+
+// ListToken ListToken
+func ListToken(c *gin.Context) {
+	_page, _ := c.GetQuery("page") // page
+	_nPage, _ := strconv.Atoi(_page)
+
+	_tokens, err := persist.GetPersist().ListToken(_nPage)
+	if err != nil {
+		c.JSON(406, gin.H{"errcode": 1, "msg": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": _tokens})
+}
+
+// CreateTokenTransfer CreateTokenTransfer
+func CreateTokenTransfer(c *gin.Context) {
+
+	var _transfer bean.TokenTransfer
+	c.Bind(&_transfer)
+
+	err := persist.GetPersist().CreateTokenTransfer(_transfer)
+	if err != nil {
+		c.JSON(200, gin.H{"errcode": 1, "msg": "create token error"})
+		return
+	}
+
+	c.JSON(200, _transfer)
+}
+
+// ListTokenTransfer ListTokenTransfer
+func ListTokenTransfer(c *gin.Context) {
+	_address := c.Params.ByName("address")
+	_page := c.Params.ByName("page")
+	_nPage, _ := strconv.Atoi(_page)
+
+	_transfers, err := persist.GetPersist().ListTokenTransfer(_address, _nPage)
+	if err != nil {
+		c.JSON(406, gin.H{"errcode": 1, "msg": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": _transfers})
 }

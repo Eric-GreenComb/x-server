@@ -55,9 +55,18 @@ func main() {
 		// r1.POST("/account/load/:keystore", handler.LoadKeystore)
 		r1.GET("/account/info/:address", handler.GetKeystore)
 
+		// ether
 		r1.POST("/token/deploy", handler.DeployToken)
-		r1.GET("/token/balance", handler.BalanceOfToken)
+		r1.POST("/token/balance/:addr", handler.BalanceOfToken)
 		r1.POST("/token/transfer", handler.TransferToken)
+		// db - token
+		r1.POST("/token/create", handler.CreateToken)
+		r1.GET("/token/info/:address", handler.TokenInfo)
+		r1.POST("/token/weight/:address/:weight", handler.UpdateTokenWeight)
+		r1.GET("/token/list", handler.ListToken)
+		// db - transfer
+		r1.POST("/token/transfer/create", handler.CreateTokenTransfer)
+		r1.GET("/token/transfer/list/:address/:page", handler.ListTokenTransfer)
 
 		r1.POST("/badger/set/:key/:value", handler.SetBadgerKey)
 		r1.POST("/badger/setwithttl/:key/:value", handler.SetBadgerKeyTTL)

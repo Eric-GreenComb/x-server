@@ -50,6 +50,11 @@ func InitDatabase() {
 		db.Set("gorm:table_options", "ENGINE=InnoDB").CreateTable(&bean.Tokens{})
 	}
 
+	if !db.HasTable(&bean.TokenTransfer{}) {
+		db.CreateTable(&bean.TokenTransfer{})
+		db.Set("gorm:table_options", "ENGINE=InnoDB").CreateTable(&bean.TokenTransfer{})
+	}
+
 	if !db.HasTable(&bean.Users{}) {
 		db.CreateTable(&bean.Users{})
 		db.Set("gorm:table_options", "ENGINE=InnoDB").CreateTable(&bean.Users{})

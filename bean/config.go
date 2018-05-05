@@ -5,6 +5,7 @@ type ServerConfig struct {
 	Port        []string
 	Mode        string
 	GormLogMode string
+	ViewLimit   int
 }
 
 // DBConfig DBConfig Struct
