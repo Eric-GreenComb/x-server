@@ -28,21 +28,43 @@ curl http://localhost:8080/api/v1/account/info/0x3c5ffa487ea89a36d3f05166bba15b9
 
 - deploy token /token/deploy/:name/:symbol/:address/:pwd
 
-curl -s -X POST http://localhost:8080/api/v1/token/deploy -d 'name=fifu&symbol=FIFU&address=0x3c5ffa487ea89a36d3f05166bba15b959e315a59&pwd=a11111'
+curl -s -X POST http://localhost:8080/api/v1/token/deploy -d 'address=0x3c5ffa487ea89a36d3f05166bba15b959e315a59&pwd=a11111&name=fifu&symbol=FIFU&total=1000000000&desc=fifu deploy'
 
 return 0x09e86ffe4333212f20f7ec958a166e8fdb0c6aa5
 
 0x70066930c500dbc07517b11e0393dc260f7296db
 
+0x95d9d1f3c47f49ca6201a6ec8c0431310c16a2fd
+
 - balance /token/balance/:addr
 
-curl -s -X POST http://localhost:8080/api/v1/token/balance/0x3c5ffa487ea89a36d3f05166bba15b959e315a59 -d 'conaddrs=0x09e86ffe4333212f20f7ec958a166e8fdb0c6aa5,0x70066930c500dbc07517b11e0393dc260f7296db'
+curl -s -X POST http://localhost:8080/api/v1/token/balance/0x3c5ffa487ea89a36d3f05166bba15b959e315a59 -d 'conaddrs=0x09e86ffe4333212f20f7ec958a166e8fdb0c6aa5,0x70066930c500dbc07517b11e0393dc260f7296db,0x95d9d1f3c47f49ca6201a6ec8c0431310c16a2fd'
+
+curl -s -X POST http://localhost:8080/api/v1/token/balance/0xeca4635f3fE81b4b8Cc6d40deFf99Eb8428C7BeD -d 'conaddrs=0x09e86ffe4333212f20f7ec958a166e8fdb0c6aa5,0x70066930c500dbc07517b11e0393dc260f7296db'
 
 curl -s -X POST http://localhost:8080/api/v1/token/balance/0xeca4635f3fE81b4b8Cc6d40deFf99Eb8428C7BeD -d 'conaddrs=0x09e86ffe4333212f20f7ec958a166e8fdb0c6aa5,0x70066930c500dbc07517b11e0393dc260f7296db'
 
 - transfer /token/transfer
 
-curl -s -X POST http://localhost:8080/api/v1/token/transfer -d 'conaddr=0x09e86ffe4333212f20f7ec958a166e8fdb0c6aa5&from=0x3c5ffa487ea89a36d3f05166bba15b959e315a59&to=0xeca4635f3fE81b4b8Cc6d40deFf99Eb8428C7BeD&amount=1000&pwd=a11111'
+curl -s -X POST http://localhost:8080/api/v1/token/transfer -d 'conaddr=0x09e86ffe4333212f20f7ec958a166e8fdb0c6aa5&from=0x3c5ffa487ea89a36d3f05166bba15b959e315a59&to=0xeca4635f3fE81b4b8Cc6d40deFf99Eb8428C7BeD&amount=1000&pwd=a11111&memo=loan'
+
+- TokenInfo /token/info/:address
+
+curl http://localhost:8080/api/v1/token/info/0x95d9d1f3c47f49ca6201a6ec8c0431310c16a2fd
+
+- UpdateTokenWeight /token/weight/:address/:weight
+
+curl -s -X POST http://localhost:8080/api/v1/token/weight/0x95d9d1f3c47f49ca6201a6ec8c0431310c16a2fd/100
+
+- ListToken /token/list/:page
+
+curl http://localhost:8080/api/v1/token/list/1
+
+- ListTokenTransfer /token/transfer/list/:address/:page
+
+curl http://localhost:8080/api/v1/token/transfer/list/0x3c5ffa487ea89a36d3f05166bba15b959e315a59/1
+
+curl http://localhost:8080/api/v1/token/transfer/list/0xeca4635f3fE81b4b8Cc6d40deFf99Eb8428C7BeD/1
 
 ## badger
 

@@ -63,7 +63,7 @@ func main() {
 		r1.POST("/token/create", handler.CreateToken)
 		r1.GET("/token/info/:address", handler.TokenInfo)
 		r1.POST("/token/weight/:address/:weight", handler.UpdateTokenWeight)
-		r1.GET("/token/list", handler.ListToken)
+		r1.GET("/token/list/:page", handler.ListToken)
 		// db - transfer
 		r1.POST("/token/transfer/create", handler.CreateTokenTransfer)
 		r1.GET("/token/transfer/list/:address/:page", handler.ListTokenTransfer)

@@ -67,7 +67,7 @@ func (persist *Persist) ListTokenTransfer(addr string, page int) ([]bean.TokenTr
 
 	var err error
 
-	err = persist.db.Table("token_transfers").Where("address = ?", addr).Order("id desc").Limit(config.ServerConfig.ViewLimit).Offset(_0ffset).Find(&transfers).Error
+	err = persist.db.Table("token_transfers").Where("from_addr = ? OR to_addr = ?", addr, addr).Order("id desc").Limit(config.ServerConfig.ViewLimit).Offset(_0ffset).Find(&transfers).Error
 
 	if err != nil {
 		return nil, err

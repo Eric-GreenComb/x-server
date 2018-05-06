@@ -20,10 +20,19 @@ import (
 // DeployToken DeployToken
 func DeployToken(c *gin.Context) {
 
-	_name := c.PostForm("name")
-	_symbol := c.PostForm("symbol")
 	_address := c.PostForm("address")
 	_pwd := c.PostForm("pwd")
+
+	_name := c.PostForm("name")
+	_symbol := c.PostForm("symbol")
+	_total := c.PostForm("total")
+	_desc := c.PostForm("desc")
+
+	_int64, err := strconv.ParseInt(_total, 10, 64)
+	if err != nil {
+		c.String(200, err.Error())
+		return
+	}
 
 	_keystore, err := persist.GetPersist().AddressInfo(_address)
 	if err != nil {
@@ -37,7 +46,7 @@ func DeployToken(c *gin.Context) {
 		return
 	}
 
-	_initialAmount := big.NewInt(1000000000000)
+	_initialAmount := big.NewInt(_int64)
 	_tokenAddress, _, _, err := token.DeployHumanStandardToken(txOpt, ether.GetEthClient(), _initialAmount, _name, 10, _symbol)
 	if err != nil {
 		c.String(200, err.Error())
@@ -45,6 +54,24 @@ func DeployToken(c *gin.Context) {
 	}
 
 	address := fmt.Sprintf("0x%x", _tokenAddress)
+
+	// save token into db
+	var _tokens bean.Tokens
+	_tokens.ESN = "fans"
+	_tokens.Address = address
+	_tokens.Name = _name
+	_tokens.Symbol = _symbol
+	_tokens.Total = _int64
+	_tokens.Desc = _desc
+	_tokens.Owner = _address
+	_tokens.Weight = 0
+	_tokens.Status = 0
+
+	err = persist.GetPersist().CreateToken(_tokens)
+	if err != nil {
+		c.JSON(200, gin.H{"errcode": 1, "msg": "create token error"})
+		return
+	}
 
 	c.JSON(200, address)
 }
@@ -87,16 +114,17 @@ func TransferToken(c *gin.Context) {
 	_to := c.PostForm("to")
 	_amount := c.PostForm("amount")
 	_pwd := c.PostForm("pwd")
-
-	_keystore, err := persist.GetPersist().AddressInfo(_from)
-	if err != nil {
-		c.JSON(200, gin.H{"errcode": 1, "msg": "get address error"})
-		return
-	}
+	_memo := c.PostForm("memo")
 
 	_int64, err := strconv.ParseInt(_amount, 10, 64)
 	if err != nil {
 		c.String(200, err.Error())
+		return
+	}
+
+	_keystore, err := persist.GetPersist().AddressInfo(_from)
+	if err != nil {
+		c.JSON(200, gin.H{"errcode": 1, "msg": "get address error"})
 		return
 	}
 
@@ -114,10 +142,26 @@ func TransferToken(c *gin.Context) {
 		return
 	}
 
+	// save transfer into db
+	var _transfer bean.TokenTransfer
+	_transfer.Address = _conaddr
+	_transfer.Type = 0
+	_transfer.FromAddr = _from
+	_transfer.ToAddr = _to
+	_transfer.Amount = _int64
+	_transfer.Memo = _memo
+
+	err = persist.GetPersist().CreateTokenTransfer(_transfer)
+	if err != nil {
+		c.JSON(200, gin.H{"errcode": 1, "msg": "create token error"})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"from":   "from",
-		"to":     _to,
-		"amount": _amount,
+		"conaddr": _conaddr,
+		"from":    _from,
+		"to":      _to,
+		"amount":  _amount,
 	})
 }
 
@@ -160,7 +204,7 @@ func UpdateTokenWeight(c *gin.Context) {
 		return
 	}
 
-	_iWeight, err := strconv.Atoi("_weight")
+	_iWeight, err := strconv.Atoi(_weight)
 	if err != nil {
 		c.JSON(422, gin.H{"errcode": 1, "msg": err.Error()})
 		return
@@ -175,7 +219,7 @@ func UpdateTokenWeight(c *gin.Context) {
 
 // ListToken ListToken
 func ListToken(c *gin.Context) {
-	_page, _ := c.GetQuery("page") // page
+	_page := c.Params.ByName("page")
 	_nPage, _ := strconv.Atoi(_page)
 
 	_tokens, err := persist.GetPersist().ListToken(_nPage)
