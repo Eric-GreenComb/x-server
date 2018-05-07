@@ -89,10 +89,12 @@ func BalanceOfToken(c *gin.Context) {
 
 		_caller, err := token.NewHumanStandardTokenCaller(common.HexToAddress(_conaddr), ether.GetEthClient())
 		if err != nil {
+			fmt.Println("Caller Error : " + err.Error())
 			continue
 		}
 		_bigint, err := _caller.BalanceOf(&bind.CallOpts{Pending: true}, common.HexToAddress(_addr))
 		if err != nil {
+			fmt.Println("BalanceOf Error : " + err.Error())
 			continue
 		}
 

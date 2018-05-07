@@ -28,6 +28,8 @@ curl -s -X POST http://localhost:8080/api/v1/account/create/13810167616/a11111
 
 return 0x6f2330c4a2cea74a35ac3ae5ec04308a50ae2a60
 
+0xE29480B8276bAb001cc728a5C0adbA29503cda77
+
 - /account/list/:userid
 
 curl http://localhost:8080/api/v1/account/list/13810167616
@@ -36,21 +38,25 @@ curl http://localhost:8080/api/v1/account/list/13810167616
 
 curl http://localhost:8080/api/v1/account/info/0x6f2330c4a2cea74a35ac3ae5ec04308a50ae2a60
 
+- /account/updatepwd/:addr/:password/:newpassword
+
+curl -s -X POST http://localhost:8080/api/v1/account/updatepwd/0x6f2330c4a2cea74a35ac3ae5ec04308a50ae2a60/a11111/b11111
+
+curl -s -X POST http://localhost:8080/api/v1/account/updatepwd/0x6f2330c4a2cea74a35ac3ae5ec04308a50ae2a60/b11111/a11111
+
 ## token
 
 - deploy token /token/deploy/:name/:symbol/:address/:pwd
 
-curl -s -X POST http://localhost:8080/api/v1/token/deploy -d 'address=0x3c5ffa487ea89a36d3f05166bba15b959e315a59&pwd=a11111&name=fifu&symbol=FIFU&total=1000000000&desc=fifu deploy'
+curl -s -X POST http://localhost:8080/api/v1/token/deploy -d 'address=0xE29480B8276bAb001cc728a5C0adbA29503cda77&pwd=a11111&name=fifu1&symbol=FIFU1&total=1000000000&desc=fifu1 deploy'
 
 return 0x09e86ffe4333212f20f7ec958a166e8fdb0c6aa5
 
-0x70066930c500dbc07517b11e0393dc260f7296db
-
-0x95d9d1f3c47f49ca6201a6ec8c0431310c16a2fd
+0xe3d032720bddcce775cd66c1d864b7030a733f5f
 
 - balance /token/balance/:addr
 
-curl -s -X POST http://localhost:8080/api/v1/token/balance/0x3c5ffa487ea89a36d3f05166bba15b959e315a59 -d 'conaddrs=0x09e86ffe4333212f20f7ec958a166e8fdb0c6aa5,0x70066930c500dbc07517b11e0393dc260f7296db,0x95d9d1f3c47f49ca6201a6ec8c0431310c16a2fd'
+curl -s -X POST http://localhost:8080/api/v1/token/balance/0xE29480B8276bAb001cc728a5C0adbA29503cda77 -d 'conaddrs=0xe3d032720bddcce775cd66c1d864b7030a733f5f,0x95d9d1f3c47f49ca6201a6ec8c0431310c16a2fd'
 
 curl -s -X POST http://localhost:8080/api/v1/token/balance/0xeca4635f3fE81b4b8Cc6d40deFf99Eb8428C7BeD -d 'conaddrs=0x09e86ffe4333212f20f7ec958a166e8fdb0c6aa5,0x70066930c500dbc07517b11e0393dc260f7296db'
 

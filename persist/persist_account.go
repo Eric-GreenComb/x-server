@@ -27,3 +27,8 @@ func (persist *Persist) ListAddress(userID string) ([]bean.Addresses, error) {
 
 	return addresses, err
 }
+
+// UpdateAccountPwd UpdateAccountPwd Persist
+func (persist *Persist) UpdateAccountPwd(userID, address, keystore string) error {
+	return persist.db.Table("addresses").Where("user_id = ? and address = ?", userID, address).Update("key_store", keystore).Error
+}

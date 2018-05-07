@@ -1,19 +1,11 @@
 package handler
 
 import (
-	"io/ioutil"
-	"os"
-
-	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/gin-gonic/gin"
 
 	"github.com/Eric-GreenComb/x-server/bean"
+	"github.com/Eric-GreenComb/x-server/ether"
 	"github.com/Eric-GreenComb/x-server/persist"
-)
-
-const (
-	veryLightScryptN = 2
-	veryLightScryptP = 1
 )
 
 // CreateAccount CreateAccount
@@ -22,21 +14,20 @@ func CreateAccount(c *gin.Context) {
 	_userID := c.Params.ByName("userid")
 	_password := c.Params.ByName("password")
 
-	_, ks := tmpKeyStore(true)
-	a, err := ks.NewAccount(_password)
+	_key, err := ether.Ks.NewKey()
 	if err != nil {
-		c.JSON(200, gin.H{"errcode": 1, "msg": "NewAccount error"})
+		c.JSON(200, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 
-	keyjson, err := ioutil.ReadFile(a.URL.Path)
+	keyjson, err := ether.Ks.GenKeystore(_key, _password)
 	if err != nil {
-		c.JSON(200, gin.H{"errcode": 1, "msg": "file is not exit"})
+		c.JSON(200, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 	var _address bean.Addresses
 	_address.UserID = _userID
-	_address.Address = a.Address.String()
+	_address.Address = _key.Address.String()
 	_address.KeyStore = string(keyjson)
 
 	err = persist.GetPersist().CreateAddress(_address)
@@ -45,14 +36,7 @@ func CreateAccount(c *gin.Context) {
 		return
 	}
 
-	//删除keystore文件
-	err = os.Remove(a.URL.Path)
-	if err != nil {
-		c.JSON(200, gin.H{"errcode": 1, "msg": err.Error()})
-		return
-	}
-
-	c.JSON(200, a.Address)
+	c.JSON(200, _key.Address.String())
 }
 
 // ListAccount ListAccount
@@ -83,14 +67,30 @@ func GetKeystore(c *gin.Context) {
 	c.String(200, _keystore.KeyStore)
 }
 
-func tmpKeyStore(encrypted bool) (string, *keystore.KeyStore) {
-	d := "./tmp"
+// UpdateAccountPwd UpdateAccountPwd
+func UpdateAccountPwd(c *gin.Context) {
 
-	new := keystore.NewPlaintextKeyStore
-	if encrypted {
-		new = func(kd string) *keystore.KeyStore {
-			return keystore.NewKeyStore(kd, veryLightScryptN, veryLightScryptP)
-		}
+	_addr := c.Params.ByName("addr")
+	_password := c.Params.ByName("password")
+	_newpassword := c.Params.ByName("newpassword")
+
+	_keystore, err := persist.GetPersist().AddressInfo(_addr)
+	if err != nil {
+		c.JSON(200, gin.H{"errcode": 1, "msg": "get address error"})
+		return
 	}
-	return d, new(d)
+
+	keyjson, err := ether.Ks.Update([]byte(_keystore.KeyStore), _password, _newpassword)
+	if err != nil {
+		c.JSON(200, gin.H{"errcode": 1, "msg": err.Error()})
+		return
+	}
+
+	err = persist.GetPersist().UpdateAccountPwd(_keystore.UserID, _addr, string(keyjson))
+	if err != nil {
+		c.JSON(200, gin.H{"errcode": 1, "msg": err.Error()})
+		return
+	}
+
+	c.JSON(200, _addr)
 }
