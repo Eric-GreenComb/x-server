@@ -54,3 +54,28 @@ func UserInfo(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": user})
 }
+
+// UpdateUserPasswd Update User Passwd
+func UpdateUserPasswd(c *gin.Context) {
+
+	_userid := c.Params.ByName("userid")
+	_old := c.Params.ByName("old")
+	_new := c.Params.ByName("new")
+
+	_, err := persist.GetPersist().Login(_userid, _old)
+	if err != nil {
+		c.JSON(422, gin.H{"errcode": 1, "msg": err.Error()})
+		return
+	}
+
+	sum := sha256.Sum256([]byte(_new))
+	newPasswd := fmt.Sprintf("%x", sum)
+
+	err = persist.GetPersist().UpdateUserPasswd(_userid, newPasswd)
+	if err != nil {
+		c.JSON(422, gin.H{"errcode": 1, "msg": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": "success"})
+}

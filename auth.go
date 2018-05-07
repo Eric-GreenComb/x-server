@@ -17,7 +17,7 @@ import (
 func Login(c *gin.Context) {
 	var _user bean.Users
 
-	if c.BindJSON(&_user) != nil {
+	if c.Bind(&_user) != nil {
 		AbortWithError(c, http.StatusBadRequest, "Missing usename or password", bean.Realm)
 		return
 	}
@@ -25,7 +25,6 @@ func Login(c *gin.Context) {
 	fmt.Println(_user)
 
 	user, err := persist.GetPersist().Login(_user.UserID, _user.Passwd)
-
 	if err != nil {
 		AbortWithError(c, http.StatusInternalServerError, "DB Query Error", bean.Realm)
 		return

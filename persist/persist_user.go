@@ -25,3 +25,8 @@ func (persist *Persist) UserInfo(userID string) (bean.Users, error) {
 
 	return user, err
 }
+
+// UpdateUserPasswd UpdateUserPasswd Persist
+func (persist *Persist) UpdateUserPasswd(userID, new string) error {
+	return persist.db.Table("users").Where("user_id = ?", userID).Update("passwd", new).Error
+}

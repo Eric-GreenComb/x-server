@@ -8,9 +8,17 @@ token x server
 
 curl -s -X POST http://localhost:8080/api/v1/users/create -d 'userID=13810167616&passwd=a11111&name=eric&email=ministor@126.com'
 
+- login 
+
+curl -s -X POST http://localhost:8080/login -d 'userID=13810167616&passwd=0fb6c6c0b7621fb7bd6ff1e6fb656bc746e2254a4f671dee25c0ce3ddd9ccf3e'
+
 - user info
 
 curl http://localhost:8080/api/v1/users/13810167616
+
+- /users/updatepasswd/:userid/:old/:new
+
+curl -s -X POST http://localhost:8080/api/v1/users/updatepasswd/13810167616/3f79bb7b435b05321651daefd374cdc681dc06faa65e374e38337b88ca046dea/a11111
 
 ## account
 
@@ -18,11 +26,15 @@ curl http://localhost:8080/api/v1/users/13810167616
 
 curl -s -X POST http://localhost:8080/api/v1/account/create/13810167616/a11111
 
-return 0x3c5ffa487ea89a36d3f05166bba15b959e315a59
+return 0x6f2330c4a2cea74a35ac3ae5ec04308a50ae2a60
+
+- /account/list/:userid
+
+curl http://localhost:8080/api/v1/account/list/13810167616
 
 - get account /account/info/:address
 
-curl http://localhost:8080/api/v1/account/info/0x3c5ffa487ea89a36d3f05166bba15b959e315a59
+curl http://localhost:8080/api/v1/account/info/0x6f2330c4a2cea74a35ac3ae5ec04308a50ae2a60
 
 ## token
 
@@ -65,6 +77,24 @@ curl http://localhost:8080/api/v1/token/list/1
 curl http://localhost:8080/api/v1/token/transfer/list/0x3c5ffa487ea89a36d3f05166bba15b959e315a59/1
 
 curl http://localhost:8080/api/v1/token/transfer/list/0xeca4635f3fE81b4b8Cc6d40deFf99Eb8428C7BeD/1
+
+## view
+
+- /view/create/:userid/:address/:tokenaddress
+
+curl -s -X POST http://localhost:8080/api/v1/view/create/13810167616/0x6f2330C4A2ceA74a35ac3AE5ec04308A50Ae2A60/0x95d9d1f3c47f49ca6201a6ec8c0431310c16a2fd
+
+- /view/delete/:userid/:address/:tokenaddress
+
+curl -s -X POST http://localhost:8080/api/v1/view/delete/13810167616/0x6f2330C4A2ceA74a35ac3AE5ec04308A50Ae2A60/0x95d9d1f3c47f49ca6201a6ec8c0431310c16a2fd
+
+- /view/info/:userid/:address/:tokenaddress
+
+curl http://localhost:8080/api/v1/view/info/13810167616/0x6f2330C4A2ceA74a35ac3AE5ec04308A50Ae2A60/0x95d9d1f3c47f49ca6201a6ec8c0431310c16a2fd
+
+- /view/list/:userid/:address
+
+curl http://localhost:8080/api/v1/view/list/13810167616/0x6f2330C4A2ceA74a35ac3AE5ec04308A50Ae2A60
 
 ## badger
 

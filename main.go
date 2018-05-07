@@ -48,12 +48,21 @@ func main() {
 	// api
 	r1 := router.Group("/api/v1")
 	{
+		// 用户
 		r1.POST("/users/create", handler.CreateUser)
 		r1.GET("/users/:userid", handler.UserInfo)
+		r1.POST("/users/updatepasswd/:userid/:old/:new", handler.UpdateUserPasswd)
 
+		// 账户
 		r1.POST("/account/create/:userid/:password", handler.CreateAccount)
-		// r1.POST("/account/load/:keystore", handler.LoadKeystore)
+		r1.GET("/account/list/:userid", handler.ListAccount)
 		r1.GET("/account/info/:address", handler.GetKeystore)
+
+		// 用户-账户-token视图
+		r1.POST("/view/create/:userid/:address/:tokenaddress", handler.CreateUserAddressTokens)
+		r1.POST("/view/delete/:userid/:address/:tokenaddress", handler.DeleteUserAddressTokens)
+		r1.GET("/view/info/:userid/:address/:tokenaddress", handler.GetUserAddressTokens)
+		r1.GET("/view/list/:userid/:address", handler.ListUserAddressTokens)
 
 		// ether
 		r1.POST("/token/deploy", handler.DeployToken)

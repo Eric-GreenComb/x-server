@@ -55,6 +55,20 @@ func CreateAccount(c *gin.Context) {
 	c.JSON(200, a.Address)
 }
 
+// ListAccount ListAccount
+func ListAccount(c *gin.Context) {
+
+	_userID := c.Params.ByName("userid")
+
+	_addresses, err := persist.GetPersist().ListAddress(_userID)
+	if err != nil {
+		c.JSON(200, gin.H{"errcode": 1, "msg": "get address error"})
+		return
+	}
+
+	c.JSON(200, _addresses)
+}
+
 // GetKeystore GetKeystore
 func GetKeystore(c *gin.Context) {
 

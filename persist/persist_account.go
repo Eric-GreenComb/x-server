@@ -18,3 +18,12 @@ func (persist *Persist) AddressInfo(addr string) (bean.Addresses, error) {
 
 	return address, err
 }
+
+// ListAddress ListAddress Persist
+func (persist *Persist) ListAddress(userID string) ([]bean.Addresses, error) {
+
+	var addresses []bean.Addresses
+	err := persist.db.Table("addresses").Select("address, user_id").Where("user_id = ?", userID).Find(&addresses).Error
+
+	return addresses, err
+}
