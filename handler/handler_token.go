@@ -249,14 +249,44 @@ func CreateTokenTransfer(c *gin.Context) {
 
 // ListTokenTransfer ListTokenTransfer
 func ListTokenTransfer(c *gin.Context) {
+
+	_tokenaddress := c.Params.ByName("tokenaddress")
 	_address := c.Params.ByName("address")
 	_page := c.Params.ByName("page")
 	_nPage, _ := strconv.Atoi(_page)
 
-	_transfers, err := persist.GetPersist().ListTokenTransfer(_address, _nPage)
+	_transfers, err := persist.GetPersist().ListTokenTransfer(_tokenaddress, _address, _nPage)
 	if err != nil {
 		c.JSON(406, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": _transfers})
+}
+
+// AllTokenTransfer AllTokenTransfer
+func AllTokenTransfer(c *gin.Context) {
+
+	_tokenaddress := c.Params.ByName("tokenaddress")
+	_page := c.Params.ByName("page")
+	_nPage, _ := strconv.Atoi(_page)
+
+	_transfers, err := persist.GetPersist().AllTokenTransfer(_tokenaddress, _nPage)
+	if err != nil {
+		c.JSON(406, gin.H{"errcode": 1, "msg": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": _transfers})
+}
+
+// CountTokenTransfer CountTokenTransfer
+func CountTokenTransfer(c *gin.Context) {
+
+	_tokenaddress := c.Params.ByName("tokenaddress")
+
+	_count, err := persist.GetPersist().CountTokenTransfer(_tokenaddress)
+	if err != nil {
+		c.JSON(406, gin.H{"errcode": 1, "msg": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": _count})
 }

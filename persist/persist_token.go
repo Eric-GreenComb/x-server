@@ -54,7 +54,7 @@ func (persist *Persist) CreateTokenTransfer(transfer bean.TokenTransfer) error {
 }
 
 // ListTokenTransfer ListTokenTransfer
-func (persist *Persist) ListTokenTransfer(addr string, page int) ([]bean.TokenTransfer, error) {
+func (persist *Persist) ListTokenTransfer(tokenAddr, addr string, page int) ([]bean.TokenTransfer, error) {
 
 	var transfers []bean.TokenTransfer
 
@@ -67,10 +67,44 @@ func (persist *Persist) ListTokenTransfer(addr string, page int) ([]bean.TokenTr
 
 	var err error
 
-	err = persist.db.Table("token_transfers").Where("from_addr = ? OR to_addr = ?", addr, addr).Order("id desc").Limit(config.ServerConfig.ViewLimit).Offset(_0ffset).Find(&transfers).Error
+	err = persist.db.Table("token_transfers").Where("address = ? AND (from_addr = ? OR to_addr = ?)", tokenAddr, addr, addr).Order("id desc").Limit(config.ServerConfig.ViewLimit).Offset(_0ffset).Find(&transfers).Error
 
 	if err != nil {
 		return nil, err
 	}
 	return transfers, nil
+}
+
+// AllTokenTransfer AllTokenTransfer
+func (persist *Persist) AllTokenTransfer(tokenAddr string, page int) ([]bean.TokenTransfer, error) {
+
+	var transfers []bean.TokenTransfer
+
+	page--
+	if page < 0 {
+		page = 0
+	}
+
+	_0ffset := page * config.ServerConfig.ViewLimit
+
+	var err error
+
+	err = persist.db.Table("token_transfers").Where("address = ?", tokenAddr).Order("id desc").Limit(config.ServerConfig.ViewLimit).Offset(_0ffset).Find(&transfers).Error
+
+	if err != nil {
+		return nil, err
+	}
+	return transfers, nil
+}
+
+// CountTokenTransfer CountTokenTransfer
+func (persist *Persist) CountTokenTransfer(tokenAddr string) (uint64, error) {
+
+	var value uint64
+	err := persist.db.Table("token_transfers").Where("address = ?", tokenAddr).Count(&value).Error
+
+	if err != nil {
+		return 0, err
+	}
+	return value, nil
 }

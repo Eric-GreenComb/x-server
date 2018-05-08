@@ -74,6 +74,18 @@ curl -s -X POST http://localhost:8080/api/v1/token/balance/0xeca4635f3fE81b4b8Cc
 
 curl -s -X POST http://localhost:8080/api/v1/token/transfer -d 'conaddr=0x09e86ffe4333212f20f7ec958a166e8fdb0c6aa5&from=0x3c5ffa487ea89a36d3f05166bba15b959e315a59&to=0xeca4635f3fE81b4b8Cc6d40deFf99Eb8428C7BeD&amount=1000&pwd=a11111&memo=loan'
 
+- /token/transfer/list/:tokenaddress/:address/:page
+
+curl http://localhost:8080/api/v1/token/transfer/list/0x09e86ffe4333212f20f7ec958a166e8fdb0c6aa5/0x3c5ffa487ea89a36d3f05166bba15b959e315a59/1
+
+- /token/transfer/all/:tokenaddress/:page
+
+curl http://localhost:8080/api/v1/token/transfer/all/0x09e86ffe4333212f20f7ec958a166e8fdb0c6aa5/1
+
+- /token/transfer/count/:tokenaddress
+
+curl http://localhost:8080/api/v1/token/transfer/count/0x09e86ffe4333212f20f7ec958a166e8fdb0c6aa5
+
 - TokenInfo /token/info/:address
 
 curl http://localhost:8080/api/v1/token/info/0x95d9d1f3c47f49ca6201a6ec8c0431310c16a2fd

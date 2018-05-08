@@ -77,7 +77,9 @@ func main() {
 		r1.GET("/token/list/:page", handler.ListToken)
 		// db - transfer
 		r1.POST("/token/transfer/create", handler.CreateTokenTransfer)
-		r1.GET("/token/transfer/list/:address/:page", handler.ListTokenTransfer)
+		r1.GET("/token/transfer/list/:tokenaddress/:address/:page", handler.ListTokenTransfer)
+		r1.GET("/token/transfer/all/:tokenaddress/:page", handler.AllTokenTransfer)
+		r1.GET("/token/transfer/count/:tokenaddress", handler.CountTokenTransfer)
 
 		r1.POST("/badger/set/:key/:value", handler.SetBadgerKey)
 		r1.POST("/badger/setwithttl/:key/:value", handler.SetBadgerKeyTTL)
