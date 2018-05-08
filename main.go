@@ -54,7 +54,7 @@ func main() {
 		r1.POST("/users/updatepasswd/:userid/:old/:new", handler.UpdateUserPasswd)
 
 		// 账户
-		r1.POST("/account/create/:userid/:password", handler.CreateAccount)
+		r1.POST("/account/create/:userid/:name/:password", handler.CreateAccount)
 		r1.GET("/account/list/:userid", handler.ListAccount)
 		r1.GET("/account/info/:address", handler.GetKeystore)
 		r1.POST("/account/updatepwd/:addr/:password/:newpassword", handler.UpdateAccountPwd)

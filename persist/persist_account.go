@@ -23,7 +23,7 @@ func (persist *Persist) AddressInfo(addr string) (bean.Addresses, error) {
 func (persist *Persist) ListAddress(userID string) ([]bean.Addresses, error) {
 
 	var addresses []bean.Addresses
-	err := persist.db.Table("addresses").Select("address, user_id").Where("user_id = ?", userID).Find(&addresses).Error
+	err := persist.db.Table("addresses").Select("created_at, address, user_id, name").Where("user_id = ?", userID).Find(&addresses).Error
 
 	return addresses, err
 }

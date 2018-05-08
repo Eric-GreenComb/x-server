@@ -13,6 +13,7 @@ import (
 func CreateAccount(c *gin.Context) {
 
 	_userID := c.Params.ByName("userid")
+	_name := c.Params.ByName("name")
 	_password := c.Params.ByName("password")
 
 	_key, err := ether.Ks.NewKey()
@@ -33,6 +34,7 @@ func CreateAccount(c *gin.Context) {
 	}
 	var _address bean.Addresses
 	_address.UserID = _userID
+	_address.Name = _name
 	_address.Address = _key.Address.String()
 	_address.KeyStore = string(keyjson)
 	_address.BackStore = string(backjson)

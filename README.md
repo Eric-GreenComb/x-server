@@ -22,15 +22,15 @@ curl -s -X POST http://localhost:8080/api/v1/users/updatepasswd/13810167616/3f79
 
 ## account
 
-- create account /account/create/:userid/:password
+- create account /account/create/:userid/:name/:password
 
-curl -s -X POST http://localhost:8080/api/v1/account/create/13810167616/a11112
+curl -s -X POST http://localhost:8080/api/v1/account/create/13810167616/培华/a11111
 
 return 0x6f2330c4a2cea74a35ac3ae5ec04308a50ae2a60
 
 0xE29480B8276bAb001cc728a5C0adbA29503cda77
 
-0xBB89978Cc97f30661f635CbF015639C078D31523
+0x946ED2768601cD9e232b1791dd883B93cd7D8CAc
 
 - /account/list/:userid
 
