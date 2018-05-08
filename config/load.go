@@ -32,6 +32,7 @@ func initConfig() {
 	ServerConfig.Mode = viper.GetString("server.mode")
 	ServerConfig.GormLogMode = viper.GetString("server.gorm.LogMode")
 	ServerConfig.ViewLimit = viper.GetInt("server.view.limit")
+	ServerConfig.Passphrase = viper.GetString("server.passphrase")
 
 	DBConfig.Dialect = viper.GetString("database.dialect")
 	DBConfig.Database = viper.GetString("database.database")

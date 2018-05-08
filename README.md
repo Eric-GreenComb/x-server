@@ -24,11 +24,13 @@ curl -s -X POST http://localhost:8080/api/v1/users/updatepasswd/13810167616/3f79
 
 - create account /account/create/:userid/:password
 
-curl -s -X POST http://localhost:8080/api/v1/account/create/13810167616/a11111
+curl -s -X POST http://localhost:8080/api/v1/account/create/13810167616/a11112
 
 return 0x6f2330c4a2cea74a35ac3ae5ec04308a50ae2a60
 
 0xE29480B8276bAb001cc728a5C0adbA29503cda77
+
+0xBB89978Cc97f30661f635CbF015639C078D31523
 
 - /account/list/:userid
 
@@ -40,23 +42,29 @@ curl http://localhost:8080/api/v1/account/info/0x6f2330c4a2cea74a35ac3ae5ec04308
 
 - /account/updatepwd/:addr/:password/:newpassword
 
-curl -s -X POST http://localhost:8080/api/v1/account/updatepwd/0x6f2330c4a2cea74a35ac3ae5ec04308a50ae2a60/a11111/b11111
+curl -s -X POST http://localhost:8080/api/v1/account/updatepwd/0xBB89978Cc97f30661f635CbF015639C078D31523/a11111/b11111
 
-curl -s -X POST http://localhost:8080/api/v1/account/updatepwd/0x6f2330c4a2cea74a35ac3ae5ec04308a50ae2a60/b11111/a11111
+curl -s -X POST http://localhost:8080/api/v1/account/updatepwd/0xBB89978Cc97f30661f635CbF015639C078D31523/b11111/a11111
+
+- /account/recover/:addr/:newpassword
+
+curl -s -X POST http://localhost:8080/api/v1/account/recover/0xBB89978Cc97f30661f635CbF015639C078D31523/a11111
 
 ## token
 
-- deploy token /token/deploy/:name/:symbol/:address/:pwd
+- deploy token /token/deploy
 
-curl -s -X POST http://localhost:8080/api/v1/token/deploy -d 'address=0xE29480B8276bAb001cc728a5C0adbA29503cda77&pwd=a11111&name=fifu1&symbol=FIFU1&total=1000000000&desc=fifu1 deploy'
+curl -s -X POST http://localhost:8080/api/v1/token/deploy -d 'address=0xBB89978Cc97f30661f635CbF015639C078D31523&pwd=a11111&name=fifu1&symbol=FIFU1&total=1000000000&desc=fifu1 deploy'
 
 return 0x09e86ffe4333212f20f7ec958a166e8fdb0c6aa5
 
 0xe3d032720bddcce775cd66c1d864b7030a733f5f
 
+0xa6e40695a50fae5f934298124e241224d37fd8bb
+
 - balance /token/balance/:addr
 
-curl -s -X POST http://localhost:8080/api/v1/token/balance/0xE29480B8276bAb001cc728a5C0adbA29503cda77 -d 'conaddrs=0xe3d032720bddcce775cd66c1d864b7030a733f5f,0x95d9d1f3c47f49ca6201a6ec8c0431310c16a2fd'
+curl -s -X POST http://localhost:8080/api/v1/token/balance/0xBB89978Cc97f30661f635CbF015639C078D31523 -d 'conaddrs=0xe3d032720bddcce775cd66c1d864b7030a733f5f,0x95d9d1f3c47f49ca6201a6ec8c0431310c16a2fd,0xa6e40695a50fae5f934298124e241224d37fd8bb'
 
 curl -s -X POST http://localhost:8080/api/v1/token/balance/0xeca4635f3fE81b4b8Cc6d40deFf99Eb8428C7BeD -d 'conaddrs=0x09e86ffe4333212f20f7ec958a166e8fdb0c6aa5,0x70066930c500dbc07517b11e0393dc260f7296db'
 

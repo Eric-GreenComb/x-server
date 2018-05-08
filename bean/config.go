@@ -6,6 +6,7 @@ type ServerConfig struct {
 	Mode        string
 	GormLogMode string
 	ViewLimit   int
+	Passphrase  string
 }
 
 // DBConfig DBConfig Struct

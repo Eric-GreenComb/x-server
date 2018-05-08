@@ -9,7 +9,8 @@ server:
   gorm:
     LogMode: false # db log
   view:
-    limit: 10  
+    limit: 10 
+  passphrase: tDydrX7ia8Zx6Vwr  # rand   
 
 ###############################################################################
 #

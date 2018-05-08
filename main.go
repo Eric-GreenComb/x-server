@@ -58,6 +58,7 @@ func main() {
 		r1.GET("/account/list/:userid", handler.ListAccount)
 		r1.GET("/account/info/:address", handler.GetKeystore)
 		r1.POST("/account/updatepwd/:addr/:password/:newpassword", handler.UpdateAccountPwd)
+		r1.POST("/account/recover/:addr/:newpassword", handler.RecoverAccountPwd)
 
 		// 用户-账户-token视图
 		r1.POST("/view/create/:userid/:address/:tokenaddress", handler.CreateUserAddressTokens)
