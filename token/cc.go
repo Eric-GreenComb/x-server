@@ -7,17 +7,19 @@ import (
 	"math/big"
 	"strings"
 
+	ethereum "github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/event"
 )
 
 // HumanStandardTokenABI is the input ABI used to generate the binding from.
-const HumanStandardTokenABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"name\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_spender\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"approve\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"totalSupply\",\"outputs\":[{\"name\":\"supply\",\"type\":\"uint256\"}],\"payable\":false,\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"transferFrom\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"decimals\",\"outputs\":[{\"name\":\"\",\"type\":\"uint8\"}],\"payable\":false,\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"version\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"name\":\"balance\",\"type\":\"uint256\"}],\"payable\":false,\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"symbol\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_spender\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"},{\"name\":\"_extraData\",\"type\":\"bytes\"}],\"name\":\"approveAndCall\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"},{\"name\":\"_spender\",\"type\":\"address\"}],\"name\":\"allowance\",\"outputs\":[{\"name\":\"remaining\",\"type\":\"uint256\"}],\"payable\":false,\"type\":\"function\"},{\"inputs\":[{\"name\":\"_initialAmount\",\"type\":\"uint256\"},{\"name\":\"_tokenName\",\"type\":\"string\"},{\"name\":\"_decimalUnits\",\"type\":\"uint8\"},{\"name\":\"_tokenSymbol\",\"type\":\"string\"}],\"payable\":false,\"type\":\"constructor\"},{\"payable\":false,\"type\":\"fallback\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"_from\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"_to\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"_owner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"_spender\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"Approval\",\"type\":\"event\"}]"
+const HumanStandardTokenABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"name\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_spender\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"approve\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"totalSupply\",\"outputs\":[{\"name\":\"supply\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"transferFrom\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"decimals\",\"outputs\":[{\"name\":\"\",\"type\":\"uint8\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"version\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"name\":\"balance\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"symbol\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_spender\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"},{\"name\":\"_extraData\",\"type\":\"bytes\"}],\"name\":\"approveAndCall\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"},{\"name\":\"_spender\",\"type\":\"address\"}],\"name\":\"allowance\",\"outputs\":[{\"name\":\"remaining\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"name\":\"_initialAmount\",\"type\":\"uint256\"},{\"name\":\"_tokenName\",\"type\":\"string\"},{\"name\":\"_decimalUnits\",\"type\":\"uint8\"},{\"name\":\"_tokenSymbol\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"fallback\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"_from\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"_to\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"_owner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"_spender\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"Approval\",\"type\":\"event\"}]"
 
 // HumanStandardTokenBin is the compiled bytecode used for deploying new contracts.
-const HumanStandardTokenBin = `0x606060405260408051908101604052600481527f48302e31000000000000000000000000000000000000000000000000000000006020820152600690805161004b9291602001906100e9565b50341561005757600080fd5b604051610bd1380380610bd183398101604052808051919060200180518201919060200180519190602001805190910190505b600160a060020a033316600090815260016020526040812085905584905560038380516100bb9291602001906100e9565b506004805460ff191660ff841617905560058180516100de9291602001906100e9565b505b50505050610189565b828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f1061012a57805160ff1916838001178555610157565b82800160010185558215610157579182015b8281111561015757825182559160200191906001019061013c565b5b50610164929150610168565b5090565b61018691905b80821115610164576000815560010161016e565b5090565b90565b610a39806101986000396000f300606060405236156100935763ffffffff60e060020a60003504166306fdde0381146100a6578063095ea7b31461013157806318160ddd1461016757806323b872dd1461018c578063313ce567146101c857806354fd4d50146101f157806370a082311461027c57806395d89b41146102ad578063a9059cbb14610338578063cae9ca511461036e578063dd62ed3e146103e7575b341561009e57600080fd5b5b600080fd5b005b34156100b157600080fd5b6100b961041e565b60405160208082528190810183818151815260200191508051906020019080838360005b838110156100f65780820151818401525b6020016100dd565b50505050905090810190601f1680156101235780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b341561013c57600080fd5b610153600160a060020a03600435166024356104bc565b604051901515815260200160405180910390f35b341561017257600080fd5b61017a610529565b60405190815260200160405180910390f35b341561019757600080fd5b610153600160a060020a0360043581169060243516604435610530565b604051901515815260200160405180910390f35b34156101d357600080fd5b6101db610629565b60405160ff909116815260200160405180910390f35b34156101fc57600080fd5b6100b9610632565b60405160208082528190810183818151815260200191508051906020019080838360005b838110156100f65780820151818401525b6020016100dd565b50505050905090810190601f1680156101235780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b341561028757600080fd5b61017a600160a060020a03600435166106d0565b60405190815260200160405180910390f35b34156102b857600080fd5b6100b96106ef565b60405160208082528190810183818151815260200191508051906020019080838360005b838110156100f65780820151818401525b6020016100dd565b50505050905090810190601f1680156101235780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b341561034357600080fd5b610153600160a060020a036004351660243561078d565b604051901515815260200160405180910390f35b341561037957600080fd5b61015360048035600160a060020a03169060248035919060649060443590810190830135806020601f8201819004810201604051908101604052818152929190602084018383808284375094965061083795505050505050565b604051901515815260200160405180910390f35b34156103f257600080fd5b61017a600160a060020a03600435811690602435166109e0565b60405190815260200160405180910390f35b60038054600181600116156101000203166002900480601f0160208091040260200160405190810160405280929190818152602001828054600181600116156101000203166002900480156104b45780601f10610489576101008083540402835291602001916104b4565b820191906000526020600020905b81548152906001019060200180831161049757829003601f168201915b505050505081565b600160a060020a03338116600081815260026020908152604080832094871680845294909152808220859055909291907f8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b9259085905190815260200160405180910390a35060015b92915050565b6000545b90565b600160a060020a0383166000908152600160205260408120548290108015906105805750600160a060020a0380851660009081526002602090815260408083203390941683529290522054829010155b801561058c5750600082115b1561061d57600160a060020a03808416600081815260016020908152604080832080548801905588851680845281842080548990039055600283528184203390961684529490915290819020805486900390559091907fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef9085905190815260200160405180910390a3506001610621565b5060005b5b9392505050565b60045460ff1681565b60068054600181600116156101000203166002900480601f0160208091040260200160405190810160405280929190818152602001828054600181600116156101000203166002900480156104b45780601f10610489576101008083540402835291602001916104b4565b820191906000526020600020905b81548152906001019060200180831161049757829003601f168201915b505050505081565b600160a060020a0381166000908152600160205260409020545b919050565b60058054600181600116156101000203166002900480601f0160208091040260200160405190810160405280929190818152602001828054600181600116156101000203166002900480156104b45780601f10610489576101008083540402835291602001916104b4565b820191906000526020600020905b81548152906001019060200180831161049757829003601f168201915b505050505081565b600160a060020a0333166000908152600160205260408120548290108015906107b65750600082115b1561082857600160a060020a033381166000818152600160205260408082208054879003905592861680825290839020805486019055917fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef9085905190815260200160405180910390a3506001610523565b506000610523565b5b92915050565b600160a060020a03338116600090815260026020908152604080832093871680845293909152808220859055909190517f72656365697665417070726f76616c28616464726573732c75696e743235362c81527f616464726573732c6279746573290000000000000000000000000000000000006020820152602e01604051809103902060e060020a9004338530866040518563ffffffff1660e060020a0281526004018085600160a060020a0316600160a060020a0316815260200184815260200183600160a060020a0316600160a060020a03168152602001828051906020019080838360005b838110156109395780820151818401525b602001610920565b50505050905090810190601f1680156109665780820380516001836020036101000a031916815260200191505b5094505050505060006040518083038160008761646e5a03f192505050151561098e57600080fd5b83600160a060020a031633600160a060020a03167f8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b9258560405190815260200160405180910390a35060015b9392505050565b600160a060020a038083166000908152600260209081526040808320938516835292905220545b929150505600a165627a7a72305820cb11f7795bb7d23ef017716f9f10c0c2bfe79452a2607b600b61512116f3bf310029`
+const HumanStandardTokenBin = `0x60c0604052600460808190527f48302e310000000000000000000000000000000000000000000000000000000060a090815261003e91600691906100d9565b5034801561004b57600080fd5b506040516109eb3803806109eb8339810160409081528151602080840151838501516060860151600160a060020a0333166000908152600185529586208590559484905590850180519395909491939101916100ac916003918601906100d9565b506004805460ff191660ff841617905580516100cf9060059060208401906100d9565b5050505050610174565b828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f1061011a57805160ff1916838001178555610147565b82800160010185558215610147579182015b8281111561014757825182559160200191906001019061012c565b50610153929150610157565b5090565b61017191905b80821115610153576000815560010161015d565b90565b610868806101836000396000f3006080604052600436106100ae5763ffffffff7c010000000000000000000000000000000000000000000000000000000060003504166306fdde0381146100c0578063095ea7b31461014a57806318160ddd1461018257806323b872dd146101a9578063313ce567146101d357806354fd4d50146101fe57806370a082311461021357806395d89b4114610234578063a9059cbb14610249578063cae9ca511461026d578063dd62ed3e146102d6575b3480156100ba57600080fd5b50600080fd5b3480156100cc57600080fd5b506100d56102fd565b6040805160208082528351818301528351919283929083019185019080838360005b8381101561010f5781810151838201526020016100f7565b50505050905090810190601f16801561013c5780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b34801561015657600080fd5b5061016e600160a060020a036004351660243561038b565b604080519115158252519081900360200190f35b34801561018e57600080fd5b506101976103f6565b60408051918252519081900360200190f35b3480156101b557600080fd5b5061016e600160a060020a03600435811690602435166044356103fc565b3480156101df57600080fd5b506101e86104ef565b6040805160ff9092168252519081900360200190f35b34801561020a57600080fd5b506100d56104f8565b34801561021f57600080fd5b50610197600160a060020a0360043516610553565b34801561024057600080fd5b506100d561056e565b34801561025557600080fd5b5061016e600160a060020a03600435166024356105c9565b34801561027957600080fd5b50604080516020600460443581810135601f810184900484028501840190955284845261016e948235600160a060020a031694602480359536959460649492019190819084018382808284375094975061066d9650505050505050565b3480156102e257600080fd5b50610197600160a060020a0360043581169060243516610811565b6003805460408051602060026001851615610100026000190190941693909304601f810184900484028201840190925281815292918301828280156103835780601f1061035857610100808354040283529160200191610383565b820191906000526020600020905b81548152906001019060200180831161036657829003601f168201915b505050505081565b600160a060020a03338116600081815260026020908152604080832094871680845294825280832086905580518681529051929493927f8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925929181900390910190a35060015b92915050565b60005490565b600160a060020a038316600090815260016020526040812054821180159061044a5750600160a060020a03808516600090815260026020908152604080832033909416835292905220548211155b80156104565750600082115b156104e457600160a060020a03808416600081815260016020908152604080832080548801905588851680845281842080548990039055600283528184203390961684529482529182902080548790039055815186815291519293927fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef9281900390910190a35060016104e8565b5060005b9392505050565b60045460ff1681565b6006805460408051602060026001851615610100026000190190941693909304601f810184900484028201840190925281815292918301828280156103835780601f1061035857610100808354040283529160200191610383565b600160a060020a031660009081526001602052604090205490565b6005805460408051602060026001851615610100026000190190941693909304601f810184900484028201840190925281815292918301828280156103835780601f1061035857610100808354040283529160200191610383565b600160a060020a03331660009081526001602052604081205482118015906105f15750600082115b1561066557600160a060020a03338116600081815260016020908152604080832080548890039055938716808352918490208054870190558351868152935191937fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef929081900390910190a35060016103f0565b5060006103f0565b600160a060020a0333818116600081815260026020908152604080832089871680855290835281842089905581517f72656365697665417070726f76616c28616464726573732c75696e743235362c81527f616464726573732c62797465732900000000000000000000000000000000000081850152915191829003602e01822063ffffffff7c010000000000000000000000000000000000000000000000000000000091829004908116909102835260048301958652602483018a9052309788166044840152885194979196909590948a9492938a93606490910191908401908083838d5b8381101561076b578181015183820152602001610753565b50505050905090810190601f1680156107985780820380516001836020036101000a031916815260200191505b509450505050506000604051808303816000875af19250505015156107bc57600080fd5b83600160a060020a031633600160a060020a03167f8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925856040518082815260200191505060405180910390a35060019392505050565b600160a060020a039182166000908152600260209081526040808320939094168252919091522054905600a165627a7a72305820ebb86da50192581c742b33785d46c723013da37041b72c0002060040533696870029`
 
 // DeployHumanStandardToken deploys a new Ethereum contract, binding an instance of HumanStandardToken to it.
 func DeployHumanStandardToken(auth *bind.TransactOpts, backend bind.ContractBackend, _initialAmount *big.Int, _tokenName string, _decimalUnits uint8, _tokenSymbol string) (common.Address, *types.Transaction, *HumanStandardToken, error) {
@@ -29,13 +31,14 @@ func DeployHumanStandardToken(auth *bind.TransactOpts, backend bind.ContractBack
 	if err != nil {
 		return common.Address{}, nil, nil, err
 	}
-	return address, tx, &HumanStandardToken{HumanStandardTokenCaller: HumanStandardTokenCaller{contract: contract}, HumanStandardTokenTransactor: HumanStandardTokenTransactor{contract: contract}}, nil
+	return address, tx, &HumanStandardToken{HumanStandardTokenCaller: HumanStandardTokenCaller{contract: contract}, HumanStandardTokenTransactor: HumanStandardTokenTransactor{contract: contract}, HumanStandardTokenFilterer: HumanStandardTokenFilterer{contract: contract}}, nil
 }
 
 // HumanStandardToken is an auto generated Go binding around an Ethereum contract.
 type HumanStandardToken struct {
 	HumanStandardTokenCaller     // Read-only binding to the contract
 	HumanStandardTokenTransactor // Write-only binding to the contract
+	HumanStandardTokenFilterer   // Log filterer for contract events
 }
 
 // HumanStandardTokenCaller is an auto generated read-only Go binding around an Ethereum contract.
@@ -45,6 +48,11 @@ type HumanStandardTokenCaller struct {
 
 // HumanStandardTokenTransactor is an auto generated write-only Go binding around an Ethereum contract.
 type HumanStandardTokenTransactor struct {
+	contract *bind.BoundContract // Generic contract wrapper for the low level calls
+}
+
+// HumanStandardTokenFilterer is an auto generated log filtering Go binding around an Ethereum contract events.
+type HumanStandardTokenFilterer struct {
 	contract *bind.BoundContract // Generic contract wrapper for the low level calls
 }
 
@@ -87,16 +95,16 @@ type HumanStandardTokenTransactorRaw struct {
 
 // NewHumanStandardToken creates a new instance of HumanStandardToken, bound to a specific deployed contract.
 func NewHumanStandardToken(address common.Address, backend bind.ContractBackend) (*HumanStandardToken, error) {
-	contract, err := bindHumanStandardToken(address, backend, backend)
+	contract, err := bindHumanStandardToken(address, backend, backend, backend)
 	if err != nil {
 		return nil, err
 	}
-	return &HumanStandardToken{HumanStandardTokenCaller: HumanStandardTokenCaller{contract: contract}, HumanStandardTokenTransactor: HumanStandardTokenTransactor{contract: contract}}, nil
+	return &HumanStandardToken{HumanStandardTokenCaller: HumanStandardTokenCaller{contract: contract}, HumanStandardTokenTransactor: HumanStandardTokenTransactor{contract: contract}, HumanStandardTokenFilterer: HumanStandardTokenFilterer{contract: contract}}, nil
 }
 
 // NewHumanStandardTokenCaller creates a new read-only instance of HumanStandardToken, bound to a specific deployed contract.
 func NewHumanStandardTokenCaller(address common.Address, caller bind.ContractCaller) (*HumanStandardTokenCaller, error) {
-	contract, err := bindHumanStandardToken(address, caller, nil)
+	contract, err := bindHumanStandardToken(address, caller, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -105,20 +113,29 @@ func NewHumanStandardTokenCaller(address common.Address, caller bind.ContractCal
 
 // NewHumanStandardTokenTransactor creates a new write-only instance of HumanStandardToken, bound to a specific deployed contract.
 func NewHumanStandardTokenTransactor(address common.Address, transactor bind.ContractTransactor) (*HumanStandardTokenTransactor, error) {
-	contract, err := bindHumanStandardToken(address, nil, transactor)
+	contract, err := bindHumanStandardToken(address, nil, transactor, nil)
 	if err != nil {
 		return nil, err
 	}
 	return &HumanStandardTokenTransactor{contract: contract}, nil
 }
 
+// NewHumanStandardTokenFilterer creates a new log filterer instance of HumanStandardToken, bound to a specific deployed contract.
+func NewHumanStandardTokenFilterer(address common.Address, filterer bind.ContractFilterer) (*HumanStandardTokenFilterer, error) {
+	contract, err := bindHumanStandardToken(address, nil, nil, filterer)
+	if err != nil {
+		return nil, err
+	}
+	return &HumanStandardTokenFilterer{contract: contract}, nil
+}
+
 // bindHumanStandardToken binds a generic wrapper to an already deployed contract.
-func bindHumanStandardToken(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor) (*bind.BoundContract, error) {
+func bindHumanStandardToken(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor, filterer bind.ContractFilterer) (*bind.BoundContract, error) {
 	parsed, err := abi.JSON(strings.NewReader(HumanStandardTokenABI))
 	if err != nil {
 		return nil, err
 	}
-	return bind.NewBoundContract(address, parsed, caller, transactor), nil
+	return bind.NewBoundContract(address, parsed, caller, transactor, filterer), nil
 }
 
 // Call invokes the (constant) contract method with params as input values and
@@ -425,11 +442,295 @@ func (_HumanStandardToken *HumanStandardTokenTransactorSession) TransferFrom(_fr
 	return _HumanStandardToken.Contract.TransferFrom(&_HumanStandardToken.TransactOpts, _from, _to, _value)
 }
 
+// HumanStandardTokenApprovalIterator is returned from FilterApproval and is used to iterate over the raw logs and unpacked data for Approval events raised by the HumanStandardToken contract.
+type HumanStandardTokenApprovalIterator struct {
+	Event *HumanStandardTokenApproval // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *HumanStandardTokenApprovalIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(HumanStandardTokenApproval)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(HumanStandardTokenApproval)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *HumanStandardTokenApprovalIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *HumanStandardTokenApprovalIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// HumanStandardTokenApproval represents a Approval event raised by the HumanStandardToken contract.
+type HumanStandardTokenApproval struct {
+	Owner   common.Address
+	Spender common.Address
+	Value   *big.Int
+	Raw     types.Log // Blockchain specific contextual infos
+}
+
+// FilterApproval is a free log retrieval operation binding the contract event 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925.
+//
+// Solidity: e Approval(_owner indexed address, _spender indexed address, _value uint256)
+func (_HumanStandardToken *HumanStandardTokenFilterer) FilterApproval(opts *bind.FilterOpts, _owner []common.Address, _spender []common.Address) (*HumanStandardTokenApprovalIterator, error) {
+
+	var _ownerRule []interface{}
+	for _, _ownerItem := range _owner {
+		_ownerRule = append(_ownerRule, _ownerItem)
+	}
+	var _spenderRule []interface{}
+	for _, _spenderItem := range _spender {
+		_spenderRule = append(_spenderRule, _spenderItem)
+	}
+
+	logs, sub, err := _HumanStandardToken.contract.FilterLogs(opts, "Approval", _ownerRule, _spenderRule)
+	if err != nil {
+		return nil, err
+	}
+	return &HumanStandardTokenApprovalIterator{contract: _HumanStandardToken.contract, event: "Approval", logs: logs, sub: sub}, nil
+}
+
+// WatchApproval is a free log subscription operation binding the contract event 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925.
+//
+// Solidity: e Approval(_owner indexed address, _spender indexed address, _value uint256)
+func (_HumanStandardToken *HumanStandardTokenFilterer) WatchApproval(opts *bind.WatchOpts, sink chan<- *HumanStandardTokenApproval, _owner []common.Address, _spender []common.Address) (event.Subscription, error) {
+
+	var _ownerRule []interface{}
+	for _, _ownerItem := range _owner {
+		_ownerRule = append(_ownerRule, _ownerItem)
+	}
+	var _spenderRule []interface{}
+	for _, _spenderItem := range _spender {
+		_spenderRule = append(_spenderRule, _spenderItem)
+	}
+
+	logs, sub, err := _HumanStandardToken.contract.WatchLogs(opts, "Approval", _ownerRule, _spenderRule)
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(HumanStandardTokenApproval)
+				if err := _HumanStandardToken.contract.UnpackLog(event, "Approval", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// HumanStandardTokenTransferIterator is returned from FilterTransfer and is used to iterate over the raw logs and unpacked data for Transfer events raised by the HumanStandardToken contract.
+type HumanStandardTokenTransferIterator struct {
+	Event *HumanStandardTokenTransfer // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *HumanStandardTokenTransferIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(HumanStandardTokenTransfer)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(HumanStandardTokenTransfer)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *HumanStandardTokenTransferIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *HumanStandardTokenTransferIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// HumanStandardTokenTransfer represents a Transfer event raised by the HumanStandardToken contract.
+type HumanStandardTokenTransfer struct {
+	From  common.Address
+	To    common.Address
+	Value *big.Int
+	Raw   types.Log // Blockchain specific contextual infos
+}
+
+// FilterTransfer is a free log retrieval operation binding the contract event 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef.
+//
+// Solidity: e Transfer(_from indexed address, _to indexed address, _value uint256)
+func (_HumanStandardToken *HumanStandardTokenFilterer) FilterTransfer(opts *bind.FilterOpts, _from []common.Address, _to []common.Address) (*HumanStandardTokenTransferIterator, error) {
+
+	var _fromRule []interface{}
+	for _, _fromItem := range _from {
+		_fromRule = append(_fromRule, _fromItem)
+	}
+	var _toRule []interface{}
+	for _, _toItem := range _to {
+		_toRule = append(_toRule, _toItem)
+	}
+
+	logs, sub, err := _HumanStandardToken.contract.FilterLogs(opts, "Transfer", _fromRule, _toRule)
+	if err != nil {
+		return nil, err
+	}
+	return &HumanStandardTokenTransferIterator{contract: _HumanStandardToken.contract, event: "Transfer", logs: logs, sub: sub}, nil
+}
+
+// WatchTransfer is a free log subscription operation binding the contract event 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef.
+//
+// Solidity: e Transfer(_from indexed address, _to indexed address, _value uint256)
+func (_HumanStandardToken *HumanStandardTokenFilterer) WatchTransfer(opts *bind.WatchOpts, sink chan<- *HumanStandardTokenTransfer, _from []common.Address, _to []common.Address) (event.Subscription, error) {
+
+	var _fromRule []interface{}
+	for _, _fromItem := range _from {
+		_fromRule = append(_fromRule, _fromItem)
+	}
+	var _toRule []interface{}
+	for _, _toItem := range _to {
+		_toRule = append(_toRule, _toItem)
+	}
+
+	logs, sub, err := _HumanStandardToken.contract.WatchLogs(opts, "Transfer", _fromRule, _toRule)
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(HumanStandardTokenTransfer)
+				if err := _HumanStandardToken.contract.UnpackLog(event, "Transfer", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
 // StandardTokenABI is the input ABI used to generate the binding from.
-const StandardTokenABI = "[{\"constant\":false,\"inputs\":[{\"name\":\"_spender\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"approve\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"totalSupply\",\"outputs\":[{\"name\":\"supply\",\"type\":\"uint256\"}],\"payable\":false,\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"transferFrom\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"name\":\"balance\",\"type\":\"uint256\"}],\"payable\":false,\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"},{\"name\":\"_spender\",\"type\":\"address\"}],\"name\":\"allowance\",\"outputs\":[{\"name\":\"remaining\",\"type\":\"uint256\"}],\"payable\":false,\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"_from\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"_to\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"_owner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"_spender\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"Approval\",\"type\":\"event\"}]"
+const StandardTokenABI = "[{\"constant\":false,\"inputs\":[{\"name\":\"_spender\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"approve\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"totalSupply\",\"outputs\":[{\"name\":\"supply\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"transferFrom\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"name\":\"balance\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"},{\"name\":\"_spender\",\"type\":\"address\"}],\"name\":\"allowance\",\"outputs\":[{\"name\":\"remaining\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"_from\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"_to\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"_owner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"_spender\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"Approval\",\"type\":\"event\"}]"
 
 // StandardTokenBin is the compiled bytecode used for deploying new contracts.
-const StandardTokenBin = `0x6060604052341561000f57600080fd5b5b61043e8061001f6000396000f300606060405236156100755763ffffffff7c0100000000000000000000000000000000000000000000000000000000600035041663095ea7b3811461007a57806318160ddd146100b057806323b872dd146100d557806370a0823114610111578063a9059cbb14610142578063dd62ed3e14610178575b600080fd5b341561008557600080fd5b61009c600160a060020a03600435166024356101af565b604051901515815260200160405180910390f35b34156100bb57600080fd5b6100c361021c565b60405190815260200160405180910390f35b34156100e057600080fd5b61009c600160a060020a0360043581169060243516604435610223565b604051901515815260200160405180910390f35b341561011c57600080fd5b6100c3600160a060020a036004351661031c565b60405190815260200160405180910390f35b341561014d57600080fd5b61009c600160a060020a036004351660243561033b565b604051901515815260200160405180910390f35b341561018357600080fd5b6100c3600160a060020a03600435811690602435166103e5565b60405190815260200160405180910390f35b600160a060020a03338116600081815260026020908152604080832094871680845294909152808220859055909291907f8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b9259085905190815260200160405180910390a35060015b92915050565b6000545b90565b600160a060020a0383166000908152600160205260408120548290108015906102735750600160a060020a0380851660009081526002602090815260408083203390941683529290522054829010155b801561027f5750600082115b1561031057600160a060020a03808416600081815260016020908152604080832080548801905588851680845281842080548990039055600283528184203390961684529490915290819020805486900390559091907fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef9085905190815260200160405180910390a3506001610314565b5060005b5b9392505050565b600160a060020a0381166000908152600160205260409020545b919050565b600160a060020a0333166000908152600160205260408120548290108015906103645750600082115b156103d657600160a060020a033381166000818152600160205260408082208054879003905592861680825290839020805486019055917fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef9085905190815260200160405180910390a3506001610216565b506000610216565b5b92915050565b600160a060020a038083166000908152600260209081526040808320938516835292905220545b929150505600a165627a7a72305820ba975f9fd4a809b65df50109fc16ac4541cfaf4b79f8bae109cdeb260e64ed520029`
+const StandardTokenBin = `0x608060405234801561001057600080fd5b506103eb806100206000396000f3006080604052600436106100775763ffffffff7c0100000000000000000000000000000000000000000000000000000000600035041663095ea7b3811461007c57806318160ddd146100b457806323b872dd146100db57806370a0823114610105578063a9059cbb14610126578063dd62ed3e1461014a575b600080fd5b34801561008857600080fd5b506100a0600160a060020a0360043516602435610171565b604080519115158252519081900360200190f35b3480156100c057600080fd5b506100c96101dc565b60408051918252519081900360200190f35b3480156100e757600080fd5b506100a0600160a060020a03600435811690602435166044356101e2565b34801561011157600080fd5b506100c9600160a060020a03600435166102d5565b34801561013257600080fd5b506100a0600160a060020a03600435166024356102f0565b34801561015657600080fd5b506100c9600160a060020a0360043581169060243516610394565b600160a060020a03338116600081815260026020908152604080832094871680845294825280832086905580518681529051929493927f8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925929181900390910190a35060015b92915050565b60005490565b600160a060020a03831660009081526001602052604081205482118015906102305750600160a060020a03808516600090815260026020908152604080832033909416835292905220548211155b801561023c5750600082115b156102ca57600160a060020a03808416600081815260016020908152604080832080548801905588851680845281842080548990039055600283528184203390961684529482529182902080548790039055815186815291519293927fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef9281900390910190a35060016102ce565b5060005b9392505050565b600160a060020a031660009081526001602052604090205490565b600160a060020a03331660009081526001602052604081205482118015906103185750600082115b1561038c57600160a060020a03338116600081815260016020908152604080832080548890039055938716808352918490208054870190558351868152935191937fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef929081900390910190a35060016101d6565b5060006101d6565b600160a060020a039182166000908152600260209081526040808320939094168252919091522054905600a165627a7a723058203d68d03a2dbb54235b0c890d006403ec9787fbb3457c5bede9bbbe5d8b3164b40029`
 
 // DeployStandardToken deploys a new Ethereum contract, binding an instance of StandardToken to it.
 func DeployStandardToken(auth *bind.TransactOpts, backend bind.ContractBackend) (common.Address, *types.Transaction, *StandardToken, error) {
@@ -441,13 +742,14 @@ func DeployStandardToken(auth *bind.TransactOpts, backend bind.ContractBackend) 
 	if err != nil {
 		return common.Address{}, nil, nil, err
 	}
-	return address, tx, &StandardToken{StandardTokenCaller: StandardTokenCaller{contract: contract}, StandardTokenTransactor: StandardTokenTransactor{contract: contract}}, nil
+	return address, tx, &StandardToken{StandardTokenCaller: StandardTokenCaller{contract: contract}, StandardTokenTransactor: StandardTokenTransactor{contract: contract}, StandardTokenFilterer: StandardTokenFilterer{contract: contract}}, nil
 }
 
 // StandardToken is an auto generated Go binding around an Ethereum contract.
 type StandardToken struct {
 	StandardTokenCaller     // Read-only binding to the contract
 	StandardTokenTransactor // Write-only binding to the contract
+	StandardTokenFilterer   // Log filterer for contract events
 }
 
 // StandardTokenCaller is an auto generated read-only Go binding around an Ethereum contract.
@@ -457,6 +759,11 @@ type StandardTokenCaller struct {
 
 // StandardTokenTransactor is an auto generated write-only Go binding around an Ethereum contract.
 type StandardTokenTransactor struct {
+	contract *bind.BoundContract // Generic contract wrapper for the low level calls
+}
+
+// StandardTokenFilterer is an auto generated log filtering Go binding around an Ethereum contract events.
+type StandardTokenFilterer struct {
 	contract *bind.BoundContract // Generic contract wrapper for the low level calls
 }
 
@@ -499,16 +806,16 @@ type StandardTokenTransactorRaw struct {
 
 // NewStandardToken creates a new instance of StandardToken, bound to a specific deployed contract.
 func NewStandardToken(address common.Address, backend bind.ContractBackend) (*StandardToken, error) {
-	contract, err := bindStandardToken(address, backend, backend)
+	contract, err := bindStandardToken(address, backend, backend, backend)
 	if err != nil {
 		return nil, err
 	}
-	return &StandardToken{StandardTokenCaller: StandardTokenCaller{contract: contract}, StandardTokenTransactor: StandardTokenTransactor{contract: contract}}, nil
+	return &StandardToken{StandardTokenCaller: StandardTokenCaller{contract: contract}, StandardTokenTransactor: StandardTokenTransactor{contract: contract}, StandardTokenFilterer: StandardTokenFilterer{contract: contract}}, nil
 }
 
 // NewStandardTokenCaller creates a new read-only instance of StandardToken, bound to a specific deployed contract.
 func NewStandardTokenCaller(address common.Address, caller bind.ContractCaller) (*StandardTokenCaller, error) {
-	contract, err := bindStandardToken(address, caller, nil)
+	contract, err := bindStandardToken(address, caller, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -517,20 +824,29 @@ func NewStandardTokenCaller(address common.Address, caller bind.ContractCaller) 
 
 // NewStandardTokenTransactor creates a new write-only instance of StandardToken, bound to a specific deployed contract.
 func NewStandardTokenTransactor(address common.Address, transactor bind.ContractTransactor) (*StandardTokenTransactor, error) {
-	contract, err := bindStandardToken(address, nil, transactor)
+	contract, err := bindStandardToken(address, nil, transactor, nil)
 	if err != nil {
 		return nil, err
 	}
 	return &StandardTokenTransactor{contract: contract}, nil
 }
 
+// NewStandardTokenFilterer creates a new log filterer instance of StandardToken, bound to a specific deployed contract.
+func NewStandardTokenFilterer(address common.Address, filterer bind.ContractFilterer) (*StandardTokenFilterer, error) {
+	contract, err := bindStandardToken(address, nil, nil, filterer)
+	if err != nil {
+		return nil, err
+	}
+	return &StandardTokenFilterer{contract: contract}, nil
+}
+
 // bindStandardToken binds a generic wrapper to an already deployed contract.
-func bindStandardToken(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor) (*bind.BoundContract, error) {
+func bindStandardToken(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor, filterer bind.ContractFilterer) (*bind.BoundContract, error) {
 	parsed, err := abi.JSON(strings.NewReader(StandardTokenABI))
 	if err != nil {
 		return nil, err
 	}
-	return bind.NewBoundContract(address, parsed, caller, transactor), nil
+	return bind.NewBoundContract(address, parsed, caller, transactor, filterer), nil
 }
 
 // Call invokes the (constant) contract method with params as input values and
@@ -712,8 +1028,292 @@ func (_StandardToken *StandardTokenTransactorSession) TransferFrom(_from common.
 	return _StandardToken.Contract.TransferFrom(&_StandardToken.TransactOpts, _from, _to, _value)
 }
 
+// StandardTokenApprovalIterator is returned from FilterApproval and is used to iterate over the raw logs and unpacked data for Approval events raised by the StandardToken contract.
+type StandardTokenApprovalIterator struct {
+	Event *StandardTokenApproval // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *StandardTokenApprovalIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(StandardTokenApproval)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(StandardTokenApproval)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *StandardTokenApprovalIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *StandardTokenApprovalIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// StandardTokenApproval represents a Approval event raised by the StandardToken contract.
+type StandardTokenApproval struct {
+	Owner   common.Address
+	Spender common.Address
+	Value   *big.Int
+	Raw     types.Log // Blockchain specific contextual infos
+}
+
+// FilterApproval is a free log retrieval operation binding the contract event 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925.
+//
+// Solidity: e Approval(_owner indexed address, _spender indexed address, _value uint256)
+func (_StandardToken *StandardTokenFilterer) FilterApproval(opts *bind.FilterOpts, _owner []common.Address, _spender []common.Address) (*StandardTokenApprovalIterator, error) {
+
+	var _ownerRule []interface{}
+	for _, _ownerItem := range _owner {
+		_ownerRule = append(_ownerRule, _ownerItem)
+	}
+	var _spenderRule []interface{}
+	for _, _spenderItem := range _spender {
+		_spenderRule = append(_spenderRule, _spenderItem)
+	}
+
+	logs, sub, err := _StandardToken.contract.FilterLogs(opts, "Approval", _ownerRule, _spenderRule)
+	if err != nil {
+		return nil, err
+	}
+	return &StandardTokenApprovalIterator{contract: _StandardToken.contract, event: "Approval", logs: logs, sub: sub}, nil
+}
+
+// WatchApproval is a free log subscription operation binding the contract event 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925.
+//
+// Solidity: e Approval(_owner indexed address, _spender indexed address, _value uint256)
+func (_StandardToken *StandardTokenFilterer) WatchApproval(opts *bind.WatchOpts, sink chan<- *StandardTokenApproval, _owner []common.Address, _spender []common.Address) (event.Subscription, error) {
+
+	var _ownerRule []interface{}
+	for _, _ownerItem := range _owner {
+		_ownerRule = append(_ownerRule, _ownerItem)
+	}
+	var _spenderRule []interface{}
+	for _, _spenderItem := range _spender {
+		_spenderRule = append(_spenderRule, _spenderItem)
+	}
+
+	logs, sub, err := _StandardToken.contract.WatchLogs(opts, "Approval", _ownerRule, _spenderRule)
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(StandardTokenApproval)
+				if err := _StandardToken.contract.UnpackLog(event, "Approval", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// StandardTokenTransferIterator is returned from FilterTransfer and is used to iterate over the raw logs and unpacked data for Transfer events raised by the StandardToken contract.
+type StandardTokenTransferIterator struct {
+	Event *StandardTokenTransfer // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *StandardTokenTransferIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(StandardTokenTransfer)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(StandardTokenTransfer)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *StandardTokenTransferIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *StandardTokenTransferIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// StandardTokenTransfer represents a Transfer event raised by the StandardToken contract.
+type StandardTokenTransfer struct {
+	From  common.Address
+	To    common.Address
+	Value *big.Int
+	Raw   types.Log // Blockchain specific contextual infos
+}
+
+// FilterTransfer is a free log retrieval operation binding the contract event 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef.
+//
+// Solidity: e Transfer(_from indexed address, _to indexed address, _value uint256)
+func (_StandardToken *StandardTokenFilterer) FilterTransfer(opts *bind.FilterOpts, _from []common.Address, _to []common.Address) (*StandardTokenTransferIterator, error) {
+
+	var _fromRule []interface{}
+	for _, _fromItem := range _from {
+		_fromRule = append(_fromRule, _fromItem)
+	}
+	var _toRule []interface{}
+	for _, _toItem := range _to {
+		_toRule = append(_toRule, _toItem)
+	}
+
+	logs, sub, err := _StandardToken.contract.FilterLogs(opts, "Transfer", _fromRule, _toRule)
+	if err != nil {
+		return nil, err
+	}
+	return &StandardTokenTransferIterator{contract: _StandardToken.contract, event: "Transfer", logs: logs, sub: sub}, nil
+}
+
+// WatchTransfer is a free log subscription operation binding the contract event 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef.
+//
+// Solidity: e Transfer(_from indexed address, _to indexed address, _value uint256)
+func (_StandardToken *StandardTokenFilterer) WatchTransfer(opts *bind.WatchOpts, sink chan<- *StandardTokenTransfer, _from []common.Address, _to []common.Address) (event.Subscription, error) {
+
+	var _fromRule []interface{}
+	for _, _fromItem := range _from {
+		_fromRule = append(_fromRule, _fromItem)
+	}
+	var _toRule []interface{}
+	for _, _toItem := range _to {
+		_toRule = append(_toRule, _toItem)
+	}
+
+	logs, sub, err := _StandardToken.contract.WatchLogs(opts, "Transfer", _fromRule, _toRule)
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(StandardTokenTransfer)
+				if err := _StandardToken.contract.UnpackLog(event, "Transfer", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
 // TokenABI is the input ABI used to generate the binding from.
-const TokenABI = "[{\"constant\":false,\"inputs\":[{\"name\":\"_spender\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"approve\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"totalSupply\",\"outputs\":[{\"name\":\"supply\",\"type\":\"uint256\"}],\"payable\":false,\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"transferFrom\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"name\":\"balance\",\"type\":\"uint256\"}],\"payable\":false,\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"},{\"name\":\"_spender\",\"type\":\"address\"}],\"name\":\"allowance\",\"outputs\":[{\"name\":\"remaining\",\"type\":\"uint256\"}],\"payable\":false,\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"_from\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"_to\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"_owner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"_spender\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"Approval\",\"type\":\"event\"}]"
+const TokenABI = "[{\"constant\":false,\"inputs\":[{\"name\":\"_spender\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"approve\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"totalSupply\",\"outputs\":[{\"name\":\"supply\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"transferFrom\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"name\":\"balance\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"},{\"name\":\"_spender\",\"type\":\"address\"}],\"name\":\"allowance\",\"outputs\":[{\"name\":\"remaining\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"_from\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"_to\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"_owner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"_spender\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"Approval\",\"type\":\"event\"}]"
 
 // TokenBin is the compiled bytecode used for deploying new contracts.
 const TokenBin = `0x`
@@ -728,13 +1328,14 @@ func DeployToken(auth *bind.TransactOpts, backend bind.ContractBackend) (common.
 	if err != nil {
 		return common.Address{}, nil, nil, err
 	}
-	return address, tx, &Token{TokenCaller: TokenCaller{contract: contract}, TokenTransactor: TokenTransactor{contract: contract}}, nil
+	return address, tx, &Token{TokenCaller: TokenCaller{contract: contract}, TokenTransactor: TokenTransactor{contract: contract}, TokenFilterer: TokenFilterer{contract: contract}}, nil
 }
 
 // Token is an auto generated Go binding around an Ethereum contract.
 type Token struct {
 	TokenCaller     // Read-only binding to the contract
 	TokenTransactor // Write-only binding to the contract
+	TokenFilterer   // Log filterer for contract events
 }
 
 // TokenCaller is an auto generated read-only Go binding around an Ethereum contract.
@@ -744,6 +1345,11 @@ type TokenCaller struct {
 
 // TokenTransactor is an auto generated write-only Go binding around an Ethereum contract.
 type TokenTransactor struct {
+	contract *bind.BoundContract // Generic contract wrapper for the low level calls
+}
+
+// TokenFilterer is an auto generated log filtering Go binding around an Ethereum contract events.
+type TokenFilterer struct {
 	contract *bind.BoundContract // Generic contract wrapper for the low level calls
 }
 
@@ -786,16 +1392,16 @@ type TokenTransactorRaw struct {
 
 // NewToken creates a new instance of Token, bound to a specific deployed contract.
 func NewToken(address common.Address, backend bind.ContractBackend) (*Token, error) {
-	contract, err := bindToken(address, backend, backend)
+	contract, err := bindToken(address, backend, backend, backend)
 	if err != nil {
 		return nil, err
 	}
-	return &Token{TokenCaller: TokenCaller{contract: contract}, TokenTransactor: TokenTransactor{contract: contract}}, nil
+	return &Token{TokenCaller: TokenCaller{contract: contract}, TokenTransactor: TokenTransactor{contract: contract}, TokenFilterer: TokenFilterer{contract: contract}}, nil
 }
 
 // NewTokenCaller creates a new read-only instance of Token, bound to a specific deployed contract.
 func NewTokenCaller(address common.Address, caller bind.ContractCaller) (*TokenCaller, error) {
-	contract, err := bindToken(address, caller, nil)
+	contract, err := bindToken(address, caller, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -804,20 +1410,29 @@ func NewTokenCaller(address common.Address, caller bind.ContractCaller) (*TokenC
 
 // NewTokenTransactor creates a new write-only instance of Token, bound to a specific deployed contract.
 func NewTokenTransactor(address common.Address, transactor bind.ContractTransactor) (*TokenTransactor, error) {
-	contract, err := bindToken(address, nil, transactor)
+	contract, err := bindToken(address, nil, transactor, nil)
 	if err != nil {
 		return nil, err
 	}
 	return &TokenTransactor{contract: contract}, nil
 }
 
+// NewTokenFilterer creates a new log filterer instance of Token, bound to a specific deployed contract.
+func NewTokenFilterer(address common.Address, filterer bind.ContractFilterer) (*TokenFilterer, error) {
+	contract, err := bindToken(address, nil, nil, filterer)
+	if err != nil {
+		return nil, err
+	}
+	return &TokenFilterer{contract: contract}, nil
+}
+
 // bindToken binds a generic wrapper to an already deployed contract.
-func bindToken(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor) (*bind.BoundContract, error) {
+func bindToken(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor, filterer bind.ContractFilterer) (*bind.BoundContract, error) {
 	parsed, err := abi.JSON(strings.NewReader(TokenABI))
 	if err != nil {
 		return nil, err
 	}
-	return bind.NewBoundContract(address, parsed, caller, transactor), nil
+	return bind.NewBoundContract(address, parsed, caller, transactor, filterer), nil
 }
 
 // Call invokes the (constant) contract method with params as input values and
@@ -997,4 +1612,288 @@ func (_Token *TokenSession) TransferFrom(_from common.Address, _to common.Addres
 // Solidity: function transferFrom(_from address, _to address, _value uint256) returns(success bool)
 func (_Token *TokenTransactorSession) TransferFrom(_from common.Address, _to common.Address, _value *big.Int) (*types.Transaction, error) {
 	return _Token.Contract.TransferFrom(&_Token.TransactOpts, _from, _to, _value)
+}
+
+// TokenApprovalIterator is returned from FilterApproval and is used to iterate over the raw logs and unpacked data for Approval events raised by the Token contract.
+type TokenApprovalIterator struct {
+	Event *TokenApproval // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *TokenApprovalIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(TokenApproval)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(TokenApproval)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *TokenApprovalIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *TokenApprovalIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// TokenApproval represents a Approval event raised by the Token contract.
+type TokenApproval struct {
+	Owner   common.Address
+	Spender common.Address
+	Value   *big.Int
+	Raw     types.Log // Blockchain specific contextual infos
+}
+
+// FilterApproval is a free log retrieval operation binding the contract event 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925.
+//
+// Solidity: e Approval(_owner indexed address, _spender indexed address, _value uint256)
+func (_Token *TokenFilterer) FilterApproval(opts *bind.FilterOpts, _owner []common.Address, _spender []common.Address) (*TokenApprovalIterator, error) {
+
+	var _ownerRule []interface{}
+	for _, _ownerItem := range _owner {
+		_ownerRule = append(_ownerRule, _ownerItem)
+	}
+	var _spenderRule []interface{}
+	for _, _spenderItem := range _spender {
+		_spenderRule = append(_spenderRule, _spenderItem)
+	}
+
+	logs, sub, err := _Token.contract.FilterLogs(opts, "Approval", _ownerRule, _spenderRule)
+	if err != nil {
+		return nil, err
+	}
+	return &TokenApprovalIterator{contract: _Token.contract, event: "Approval", logs: logs, sub: sub}, nil
+}
+
+// WatchApproval is a free log subscription operation binding the contract event 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925.
+//
+// Solidity: e Approval(_owner indexed address, _spender indexed address, _value uint256)
+func (_Token *TokenFilterer) WatchApproval(opts *bind.WatchOpts, sink chan<- *TokenApproval, _owner []common.Address, _spender []common.Address) (event.Subscription, error) {
+
+	var _ownerRule []interface{}
+	for _, _ownerItem := range _owner {
+		_ownerRule = append(_ownerRule, _ownerItem)
+	}
+	var _spenderRule []interface{}
+	for _, _spenderItem := range _spender {
+		_spenderRule = append(_spenderRule, _spenderItem)
+	}
+
+	logs, sub, err := _Token.contract.WatchLogs(opts, "Approval", _ownerRule, _spenderRule)
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(TokenApproval)
+				if err := _Token.contract.UnpackLog(event, "Approval", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// TokenTransferIterator is returned from FilterTransfer and is used to iterate over the raw logs and unpacked data for Transfer events raised by the Token contract.
+type TokenTransferIterator struct {
+	Event *TokenTransfer // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *TokenTransferIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(TokenTransfer)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(TokenTransfer)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *TokenTransferIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *TokenTransferIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// TokenTransfer represents a Transfer event raised by the Token contract.
+type TokenTransfer struct {
+	From  common.Address
+	To    common.Address
+	Value *big.Int
+	Raw   types.Log // Blockchain specific contextual infos
+}
+
+// FilterTransfer is a free log retrieval operation binding the contract event 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef.
+//
+// Solidity: e Transfer(_from indexed address, _to indexed address, _value uint256)
+func (_Token *TokenFilterer) FilterTransfer(opts *bind.FilterOpts, _from []common.Address, _to []common.Address) (*TokenTransferIterator, error) {
+
+	var _fromRule []interface{}
+	for _, _fromItem := range _from {
+		_fromRule = append(_fromRule, _fromItem)
+	}
+	var _toRule []interface{}
+	for _, _toItem := range _to {
+		_toRule = append(_toRule, _toItem)
+	}
+
+	logs, sub, err := _Token.contract.FilterLogs(opts, "Transfer", _fromRule, _toRule)
+	if err != nil {
+		return nil, err
+	}
+	return &TokenTransferIterator{contract: _Token.contract, event: "Transfer", logs: logs, sub: sub}, nil
+}
+
+// WatchTransfer is a free log subscription operation binding the contract event 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef.
+//
+// Solidity: e Transfer(_from indexed address, _to indexed address, _value uint256)
+func (_Token *TokenFilterer) WatchTransfer(opts *bind.WatchOpts, sink chan<- *TokenTransfer, _from []common.Address, _to []common.Address) (event.Subscription, error) {
+
+	var _fromRule []interface{}
+	for _, _fromItem := range _from {
+		_fromRule = append(_fromRule, _fromItem)
+	}
+	var _toRule []interface{}
+	for _, _toItem := range _to {
+		_toRule = append(_toRule, _toItem)
+	}
+
+	logs, sub, err := _Token.contract.WatchLogs(opts, "Transfer", _fromRule, _toRule)
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(TokenTransfer)
+				if err := _Token.contract.UnpackLog(event, "Transfer", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
 }

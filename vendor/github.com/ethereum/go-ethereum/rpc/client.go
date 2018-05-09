@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"net"
 	"net/url"
+	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -171,11 +172,52 @@ func DialContext(ctx context.Context, rawurl string) (*Client, error) {
 		return DialHTTP(rawurl)
 	case "ws", "wss":
 		return DialWebsocket(ctx, rawurl, "")
+	case "stdio":
+		return DialStdIO(ctx)
 	case "":
 		return DialIPC(ctx, rawurl)
 	default:
 		return nil, fmt.Errorf("no known transport for URL scheme %q", u.Scheme)
 	}
+}
+
+type StdIOConn struct{}
+
+func (io StdIOConn) Read(b []byte) (n int, err error) {
+	return os.Stdin.Read(b)
+}
+
+func (io StdIOConn) Write(b []byte) (n int, err error) {
+	return os.Stdout.Write(b)
+}
+
+func (io StdIOConn) Close() error {
+	return nil
+}
+
+func (io StdIOConn) LocalAddr() net.Addr {
+	return &net.UnixAddr{Name: "stdio", Net: "stdio"}
+}
+
+func (io StdIOConn) RemoteAddr() net.Addr {
+	return &net.UnixAddr{Name: "stdio", Net: "stdio"}
+}
+
+func (io StdIOConn) SetDeadline(t time.Time) error {
+	return &net.OpError{Op: "set", Net: "stdio", Source: nil, Addr: nil, Err: errors.New("deadline not supported")}
+}
+
+func (io StdIOConn) SetReadDeadline(t time.Time) error {
+	return &net.OpError{Op: "set", Net: "stdio", Source: nil, Addr: nil, Err: errors.New("deadline not supported")}
+}
+
+func (io StdIOConn) SetWriteDeadline(t time.Time) error {
+	return &net.OpError{Op: "set", Net: "stdio", Source: nil, Addr: nil, Err: errors.New("deadline not supported")}
+}
+func DialStdIO(ctx context.Context) (*Client, error) {
+	return newClient(ctx, func(_ context.Context) (net.Conn, error) {
+		return StdIOConn{}, nil
+	})
 }
 
 func newClient(initctx context.Context, connectFunc func(context.Context) (net.Conn, error)) (*Client, error) {
@@ -184,7 +226,6 @@ func newClient(initctx context.Context, connectFunc func(context.Context) (net.C
 		return nil, err
 	}
 	_, isHTTP := conn.(*httpConn)
-
 	c := &Client{
 		writeConn:   conn,
 		isHTTP:      isHTTP,
@@ -349,85 +390,49 @@ func (c *Client) BatchCallContext(ctx context.Context, b []BatchElem) error {
 	return err
 }
 
-// ShhSubscribe calls the "shh_subscribe" method with the given arguments,
-// registering a subscription. Server notifications for the subscription are
-// sent to the given channel. The element type of the channel must match the
-// expected type of content returned by the subscription.
-//
-// The context argument cancels the RPC request that sets up the subscription but has no
-// effect on the subscription after ShhSubscribe has returned.
-//
-// Slow subscribers will be dropped eventually. Client buffers up to 8000 notifications
-// before considering the subscriber dead. The subscription Err channel will receive
-// ErrSubscriptionQueueOverflow. Use a sufficiently large buffer on the channel or ensure
-// that the channel usually has at least one reader to prevent this issue.
-func (c *Client) ShhSubscribe(ctx context.Context, channel interface{}, args ...interface{}) (*ClientSubscription, error) {
-	// Check type of channel first.
-	chanVal := reflect.ValueOf(channel)
-	if chanVal.Kind() != reflect.Chan || chanVal.Type().ChanDir()&reflect.SendDir == 0 {
-		panic("first argument to ShhSubscribe must be a writable channel")
-	}
-	if chanVal.IsNil() {
-		panic("channel given to ShhSubscribe must not be nil")
-	}
-	if c.isHTTP {
-		return nil, ErrNotificationsUnsupported
-	}
-
-	msg, err := c.newMessage("shh"+subscribeMethodSuffix, args...)
-	if err != nil {
-		return nil, err
-	}
-	op := &requestOp{
-		ids:  []json.RawMessage{msg.ID},
-		resp: make(chan *jsonrpcMessage),
-		sub:  newClientSubscription(c, "shh", chanVal),
-	}
-
-	// Send the subscription request.
-	// The arrival and validity of the response is signaled on sub.quit.
-	if err := c.send(ctx, op, msg); err != nil {
-		return nil, err
-	}
-	if _, err := op.wait(ctx); err != nil {
-		return nil, err
-	}
-	return op.sub, nil
+// EthSubscribe registers a subscripion under the "eth" namespace.
+func (c *Client) EthSubscribe(ctx context.Context, channel interface{}, args ...interface{}) (*ClientSubscription, error) {
+	return c.Subscribe(ctx, "eth", channel, args...)
 }
 
-// EthSubscribe calls the "eth_subscribe" method with the given arguments,
+// ShhSubscribe registers a subscripion under the "shh" namespace.
+func (c *Client) ShhSubscribe(ctx context.Context, channel interface{}, args ...interface{}) (*ClientSubscription, error) {
+	return c.Subscribe(ctx, "shh", channel, args...)
+}
+
+// Subscribe calls the "<namespace>_subscribe" method with the given arguments,
 // registering a subscription. Server notifications for the subscription are
 // sent to the given channel. The element type of the channel must match the
 // expected type of content returned by the subscription.
 //
 // The context argument cancels the RPC request that sets up the subscription but has no
-// effect on the subscription after EthSubscribe has returned.
+// effect on the subscription after Subscribe has returned.
 //
 // Slow subscribers will be dropped eventually. Client buffers up to 8000 notifications
 // before considering the subscriber dead. The subscription Err channel will receive
 // ErrSubscriptionQueueOverflow. Use a sufficiently large buffer on the channel or ensure
 // that the channel usually has at least one reader to prevent this issue.
-func (c *Client) EthSubscribe(ctx context.Context, channel interface{}, args ...interface{}) (*ClientSubscription, error) {
+func (c *Client) Subscribe(ctx context.Context, namespace string, channel interface{}, args ...interface{}) (*ClientSubscription, error) {
 	// Check type of channel first.
 	chanVal := reflect.ValueOf(channel)
 	if chanVal.Kind() != reflect.Chan || chanVal.Type().ChanDir()&reflect.SendDir == 0 {
-		panic("first argument to EthSubscribe must be a writable channel")
+		panic("first argument to Subscribe must be a writable channel")
 	}
 	if chanVal.IsNil() {
-		panic("channel given to EthSubscribe must not be nil")
+		panic("channel given to Subscribe must not be nil")
 	}
 	if c.isHTTP {
 		return nil, ErrNotificationsUnsupported
 	}
 
-	msg, err := c.newMessage("eth"+subscribeMethodSuffix, args...)
+	msg, err := c.newMessage(namespace+subscribeMethodSuffix, args...)
 	if err != nil {
 		return nil, err
 	}
 	op := &requestOp{
 		ids:  []json.RawMessage{msg.ID},
 		resp: make(chan *jsonrpcMessage),
-		sub:  newClientSubscription(c, "eth", chanVal),
+		sub:  newClientSubscription(c, namespace, chanVal),
 	}
 
 	// Send the subscription request.
@@ -560,13 +565,13 @@ func (c *Client) dispatch(conn net.Conn) {
 			}
 
 		case err := <-c.readErr:
-			log.Debug(fmt.Sprintf("<-readErr: %v", err))
+			log.Debug("<-readErr", "err", err)
 			c.closeRequestOps(err)
 			conn.Close()
 			reading = false
 
 		case newconn := <-c.reconnected:
-			log.Debug(fmt.Sprintf("<-reconnected: (reading=%t) %v", reading, conn.RemoteAddr()))
+			log.Debug("<-reconnected", "reading", reading, "remote", conn.RemoteAddr())
 			if reading {
 				// Wait for the previous read loop to exit. This is a rare case.
 				conn.Close()
@@ -623,7 +628,7 @@ func (c *Client) closeRequestOps(err error) {
 
 func (c *Client) handleNotification(msg *jsonrpcMessage) {
 	if !strings.HasSuffix(msg.Method, notificationMethodSuffix) {
-		log.Debug(fmt.Sprint("dropping non-subscription message: ", msg))
+		log.Debug("dropping non-subscription message", "msg", msg)
 		return
 	}
 	var subResult struct {
@@ -631,7 +636,7 @@ func (c *Client) handleNotification(msg *jsonrpcMessage) {
 		Result json.RawMessage `json:"result"`
 	}
 	if err := json.Unmarshal(msg.Params, &subResult); err != nil {
-		log.Debug(fmt.Sprint("dropping invalid subscription message: ", msg))
+		log.Debug("dropping invalid subscription message", "msg", msg)
 		return
 	}
 	if c.subs[subResult.ID] != nil {
@@ -642,7 +647,7 @@ func (c *Client) handleNotification(msg *jsonrpcMessage) {
 func (c *Client) handleResponse(msg *jsonrpcMessage) {
 	op := c.respWait[string(msg.ID)]
 	if op == nil {
-		log.Debug(fmt.Sprintf("unsolicited response %v", msg))
+		log.Debug("unsolicited response", "msg", msg)
 		return
 	}
 	delete(c.respWait, string(msg.ID))

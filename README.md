@@ -8,7 +8,7 @@ token x server
 
 curl -s -X POST http://localhost:8080/api/v1/users/create -d 'userID=13810167616&passwd=a11111&name=eric&email=ministor@126.com'
 
-- login 
+- login passwd为passwd的 sha256 hash
 
 curl -s -X POST http://localhost:8080/login -d 'userID=13810167616&passwd=0fb6c6c0b7621fb7bd6ff1e6fb656bc746e2254a4f671dee25c0ce3ddd9ccf3e'
 
@@ -26,9 +26,7 @@ curl -s -X POST http://localhost:8080/api/v1/users/updatepasswd/13810167616/3f79
 
 curl -s -X POST http://localhost:8080/api/v1/account/create/13810167616/培华/a11111
 
-return 0x6f2330c4a2cea74a35ac3ae5ec04308a50ae2a60
-
-0xE29480B8276bAb001cc728a5C0adbA29503cda77
+return
 
 0x946ED2768601cD9e232b1791dd883B93cd7D8CAc
 
@@ -54,7 +52,7 @@ curl -s -X POST http://localhost:8080/api/v1/account/recover/0xBB89978Cc97f30661
 
 - deploy token /token/deploy
 
-curl -s -X POST http://localhost:8080/api/v1/token/deploy -d 'address=0xBB89978Cc97f30661f635CbF015639C078D31523&pwd=a11111&name=fifu1&symbol=FIFU1&total=1000000000&desc=fifu1 deploy'
+curl -s -X POST http://localhost:8080/api/v1/token/deploy -d 'address=0x5C0417A3a20F928e1Ea115E0A5c185d0879E153F&pwd=a11111&name=fifu2&symbol=FIFU2&total=1000000000&desc=fifu2 deploy'
 
 return 0x09e86ffe4333212f20f7ec958a166e8fdb0c6aa5
 
@@ -62,9 +60,11 @@ return 0x09e86ffe4333212f20f7ec958a166e8fdb0c6aa5
 
 0xa6e40695a50fae5f934298124e241224d37fd8bb
 
+0xb3804f741937595475bb7e8e46e7645613a5705a
+
 - balance /token/balance/:addr
 
-curl -s -X POST http://localhost:8080/api/v1/token/balance/0xBB89978Cc97f30661f635CbF015639C078D31523 -d 'conaddrs=0xe3d032720bddcce775cd66c1d864b7030a733f5f,0x95d9d1f3c47f49ca6201a6ec8c0431310c16a2fd,0xa6e40695a50fae5f934298124e241224d37fd8bb'
+curl -s -X POST http://localhost:8080/api/v1/token/balance/0x5C0417A3a20F928e1Ea115E0A5c185d0879E153F -d 'conaddrs=0xe3d032720bddcce775cd66c1d864b7030a733f5f,0x95d9d1f3c47f49ca6201a6ec8c0431310c16a2fd,0xa6e40695a50fae5f934298124e241224d37fd8bb,0xb3804f741937595475bb7e8e46e7645613a5705a'
 
 curl -s -X POST http://localhost:8080/api/v1/token/balance/0xeca4635f3fE81b4b8Cc6d40deFf99Eb8428C7BeD -d 'conaddrs=0x09e86ffe4333212f20f7ec958a166e8fdb0c6aa5,0x70066930c500dbc07517b11e0393dc260f7296db'
 
@@ -72,7 +72,7 @@ curl -s -X POST http://localhost:8080/api/v1/token/balance/0xeca4635f3fE81b4b8Cc
 
 - transfer /token/transfer
 
-curl -s -X POST http://localhost:8080/api/v1/token/transfer -d 'conaddr=0x09e86ffe4333212f20f7ec958a166e8fdb0c6aa5&from=0x3c5ffa487ea89a36d3f05166bba15b959e315a59&to=0xeca4635f3fE81b4b8Cc6d40deFf99Eb8428C7BeD&amount=1000&pwd=a11111&memo=loan'
+curl -s -X POST http://localhost:8080/api/v1/token/transfer -d 'conaddr=0xb3804f741937595475bb7e8e46e7645613a5705a&from=0x5C0417A3a20F928e1Ea115E0A5c185d0879E153F&to=0xeca4635f3fE81b4b8Cc6d40deFf99Eb8428C7BeD&amount=1000&pwd=a11111&memo=loan'
 
 - /token/transfer/list/:tokenaddress/:address/:page
 
