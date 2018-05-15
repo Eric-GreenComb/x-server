@@ -65,6 +65,7 @@ func main() {
 		r1.POST("/view/delete/:userid/:address/:tokenaddress", handler.DeleteUserAddressTokens)
 		r1.GET("/view/info/:userid/:address/:tokenaddress", handler.GetUserAddressTokens)
 		r1.GET("/view/list/:userid/:address", handler.ListUserAddressTokens)
+		r1.GET("/view/balance/:userid/:address", handler.ListUserAddressTokenBanlance)
 
 		// ether
 		r1.POST("/token/deploy", handler.DeployToken)

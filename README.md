@@ -48,9 +48,11 @@ curl -s -X POST http://123.206.29.15:4100/api/v1/account/recover/0x20B5c492B5391
 
 - deploy token /token/deploy
 
-curl -s -X POST http://123.206.29.15:4100/api/v1/token/deploy -d 'address=0x20B5c492B53919e4bfC279C4a43CE350Bb7fDF7c&pwd=a11111&name=fifu&symbol=FIFU&total=1000000000&desc=fifu deploy'
+curl -s -X POST http://123.206.29.15:4100/api/v1/token/deploy -d 'address=0x37213Efe922A06C3e5EF99A6DBd9dAaB35B81393&pwd=a11111&name=fifu&symbol=FIFU&total=1000000000&desc=fifu deploy'
 
 return 0x1dd80b503e3b5de5724fe204bc87fb5387b0470c
+
+0xbe589d63faa88007a6de0572f2e90c3bde68ad03
 
 - balance /token/balance/:addr
 
@@ -88,7 +90,7 @@ curl http://123.206.29.15:4100/api/v1/token/list/1
 
 - /view/create/:userid/:address/:tokenaddress
 
-curl -s -X POST http://123.206.29.15:4100/api/v1/view/create/13810167616/0x20B5c492B53919e4bfC279C4a43CE350Bb7fDF7c/0x1dd80b503e3b5de5724fe204bc87fb5387b0470c
+curl -s -X POST http://123.206.29.15:4100/api/v1/view/create/13810167616/0x37213Efe922A06C3e5EF99A6DBd9dAaB35B81393/0xbe589d63faa88007a6de0572f2e90c3bde68ad03
 
 - /view/delete/:userid/:address/:tokenaddress
 
@@ -100,7 +102,11 @@ curl http://123.206.29.15:4100/api/v1/view/info/13810167616/0x20B5c492B53919e4bf
 
 - /view/list/:userid/:address
 
-curl http://123.206.29.15:4100/api/v1/view/list/13810167616/0x20B5c492B53919e4bfC279C4a43CE350Bb7fDF7c
+curl http://123.206.29.15:4100/api/v1/view/list/13810167616/0x37213Efe922A06C3e5EF99A6DBd9dAaB35B81393
+
+- /view/balance/:userid/:address
+
+curl http://123.206.29.15:4100/api/v1/view/balance/13810167616/0x37213Efe922A06C3e5EF99A6DBd9dAaB35B81393
 
 ## badger
 

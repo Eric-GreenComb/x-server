@@ -1,12 +1,17 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/gin-gonic/gin"
 
 	"github.com/Eric-GreenComb/x-server/bean"
+	"github.com/Eric-GreenComb/x-server/ether"
 	"github.com/Eric-GreenComb/x-server/persist"
+	"github.com/Eric-GreenComb/x-server/token"
 )
 
 // CreateUserAddressTokens CreateUserAddressTokens User
@@ -91,4 +96,43 @@ func ListUserAddressTokens(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": userAddressTokens})
+}
+
+// ListUserAddressTokenBanlance ListUserAddressTokenBanlance Info
+func ListUserAddressTokenBanlance(c *gin.Context) {
+
+	_userID := c.Params.ByName("userid")
+	_address := c.Params.ByName("address")
+
+	userAddressTokens, err := persist.GetPersist().ListUserAddressTokens(_userID, _address)
+
+	if err != nil {
+		c.JSON(422, gin.H{"errcode": 1, "msg": err.Error()})
+		return
+	}
+
+	var tokenValues []bean.TokenValue
+	for _, userAddressToken := range userAddressTokens {
+
+		_caller, err := token.NewHumanStandardTokenCaller(common.HexToAddress(userAddressToken.TokenAddress), ether.GetEthClient())
+		if err != nil {
+			fmt.Println("Caller Error : " + err.Error())
+			continue
+		}
+		_bigint, err := _caller.BalanceOf(&bind.CallOpts{Pending: true}, common.HexToAddress(_address))
+		if err != nil {
+			fmt.Println("BalanceOf Error : " + err.Error())
+			continue
+		}
+
+		var tokenValue bean.TokenValue
+		tokenValue.Address = userAddressToken.TokenAddress
+		tokenValue.Name = userAddressToken.Name
+		tokenValue.Symbol = userAddressToken.Symbol
+		tokenValue.Balance = _bigint.String()
+
+		tokenValues = append(tokenValues, tokenValue)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": tokenValues})
 }
