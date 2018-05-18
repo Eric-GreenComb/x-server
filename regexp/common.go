@@ -34,7 +34,7 @@ func IsUsername(username string) bool {
 }
 
 const (
-	regularMobile = "^(13[0-9]|14[57]|15[0-35-9]|18[07-9])\\d{8}$"
+	regularMobile = "^1([38][0-9]|14[57]|5[^4])\\d{8}$"
 )
 
 // IsMobile check if mobile
