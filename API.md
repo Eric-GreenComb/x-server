@@ -24,11 +24,11 @@ curl -s -X POST http://123.206.29.15:4100/api/v1/users/updatepasswd/13810167616/
 
 - create account /account/create/:userid/:name/:password
 
-curl -s -X POST http://123.206.29.15:4100/api/v1/account/create/13810167616/培华/a11111
+curl -s -X POST http://123.206.29.15:4100/api/v1/account/create/13810167616/13810167616/a11111
 
 return
 
-0x20B5c492B53919e4bfC279C4a43CE350Bb7fDF7c
+0x12f91a58bf2714ec602f3c3b9841Ddf98478DFF0
 
 - /account/list/:userid
 
@@ -36,45 +36,49 @@ curl http://123.206.29.15:4100/api/v1/account/list/13810167616
 
 - /account/updatepwd/:addr/:password/:newpassword
 
-curl -s -X POST http://123.206.29.15:4100/api/v1/account/updatepwd/0x20B5c492B53919e4bfC279C4a43CE350Bb7fDF7c/a11111/b11111
+curl -s -X POST http://123.206.29.15:4100/api/v1/account/updatepwd/0x12f91a58bf2714ec602f3c3b9841Ddf98478DFF0/a11111/b11111
 
-curl -s -X POST http://123.206.29.15:4100/api/v1/account/updatepwd/0x20B5c492B53919e4bfC279C4a43CE350Bb7fDF7c/b11111/a11111
+curl -s -X POST http://123.206.29.15:4100/api/v1/account/updatepwd/0x12f91a58bf2714ec602f3c3b9841Ddf98478DFF0/b11111/a11111
 
 - /account/recover/:addr/:newpassword
 
-curl -s -X POST http://123.206.29.15:4100/api/v1/account/recover/0x20B5c492B53919e4bfC279C4a43CE350Bb7fDF7c/a11111
+curl -s -X POST http://123.206.29.15:4100/api/v1/account/recover/0x12f91a58bf2714ec602f3c3b9841Ddf98478DFF0/a11111
 
 ## token
 
 - deploy token /token/deploy
 
-curl -s -X POST http://123.206.29.15:4100/api/v1/token/deploy -d 'address=0x20B5c492B53919e4bfC279C4a43CE350Bb7fDF7c&pwd=a11111&name=fifu&symbol=FIFU&total=1000000000&desc=fifu deploy'
+curl -s -X POST http://123.206.29.15:4100/api/v1/token/deploy -d 'address=0x12f91a58bf2714ec602f3c3b9841Ddf98478DFF0&pwd=a11111&name=歌手A&symbol=STA&total=1000000000&desc=歌手A发的Token'
 
-return 0x1dd80b503e3b5de5724fe204bc87fb5387b0470c
+return 0x13e55998e931687c1a19d6281d58fb3622e5c6fc
+
+curl -s -X POST http://123.206.29.15:4100/api/v1/token/deploy -d 'address=0x12f91a58bf2714ec602f3c3b9841Ddf98478DFF0&pwd=a11111&name=歌手B&symbol=STB&total=1000000000&desc=歌手B发的Token'
+
+return 0x8092e36cbbf1be3095fa1e19daf418dc79ce31d5
 
 - balance /token/balance/:addr
 
-curl -s -X POST http://123.206.29.15:4100/api/v1/token/balance/0x20B5c492B53919e4bfC279C4a43CE350Bb7fDF7c -d 'conaddrs=0x1dd80b503e3b5de5724fe204bc87fb5387b0470c,0x95d9d1f3c47f49ca6201a6ec8c0431310c16a2fd,0xa6e40695a50fae5f934298124e241224d37fd8bb,0xb3804f741937595475bb7e8e46e7645613a5705a'
+curl -s -X POST http://123.206.29.15:4100/api/v1/token/balance/0x12f91a58bf2714ec602f3c3b9841Ddf98478DFF0 -d 'conaddrs=0x13e55998e931687c1a19d6281d58fb3622e5c6fc,0x8092e36cbbf1be3095fa1e19daf418dc79ce31d5,0xa6e40695a50fae5f934298124e241224d37fd8bb,0xb3804f741937595475bb7e8e46e7645613a5705a'
 
 - transfer /token/transfer
 
-curl -s -X POST http://123.206.29.15:4100/api/v1/token/transfer -d 'conaddr=0x1dd80b503e3b5de5724fe204bc87fb5387b0470c&from=0x20B5c492B53919e4bfC279C4a43CE350Bb7fDF7c&to=0xeca4635f3fE81b4b8Cc6d40deFf99Eb8428C7BeD&amount=1000&pwd=a11111&memo=loan'
+curl -s -X POST http://123.206.29.15:4100/api/v1/token/transfer -d 'conaddr=0x13e55998e931687c1a19d6281d58fb3622e5c6fc&from=0x12f91a58bf2714ec602f3c3b9841Ddf98478DFF0&to=0xeca4635f3fE81b4b8Cc6d40deFf99Eb8428C7BeD&amount=1000&pwd=a11111&memo=loan'
 
 - /token/transfer/list/:tokenaddress/:address/:page
 
-curl http://123.206.29.15:4100/api/v1/token/transfer/list/0x1dd80b503e3b5de5724fe204bc87fb5387b0470c/0x20B5c492B53919e4bfC279C4a43CE350Bb7fDF7c/1
+curl http://123.206.29.15:4100/api/v1/token/transfer/list/0x13e55998e931687c1a19d6281d58fb3622e5c6fc/0x12f91a58bf2714ec602f3c3b9841Ddf98478DFF0/1
 
 - /token/transfer/all/:tokenaddress/:page
 
-curl http://123.206.29.15:4100/api/v1/token/transfer/all/0x1dd80b503e3b5de5724fe204bc87fb5387b0470c/1
+curl http://123.206.29.15:4100/api/v1/token/transfer/all/0x13e55998e931687c1a19d6281d58fb3622e5c6fc/1
 
 - /token/transfer/count/:tokenaddress
 
-curl http://123.206.29.15:4100/api/v1/token/transfer/count/0x1dd80b503e3b5de5724fe204bc87fb5387b0470c
+curl http://123.206.29.15:4100/api/v1/token/transfer/count/0x13e55998e931687c1a19d6281d58fb3622e5c6fc
 
 - TokenInfo /token/info/:address
 
-curl http://123.206.29.15:4100/api/v1/token/info/0x1dd80b503e3b5de5724fe204bc87fb5387b0470c
+curl http://123.206.29.15:4100/api/v1/token/info/0x13e55998e931687c1a19d6281d58fb3622e5c6fc
 
 - UpdateTokenWeight /token/weight/:address/:weight
 
@@ -88,7 +92,7 @@ curl http://123.206.29.15:4100/api/v1/token/list/1
 
 - /view/create/:userid/:address/:tokenaddress
 
-curl -s -X POST http://123.206.29.15:4100/api/v1/view/create/13810167616/0x20B5c492B53919e4bfC279C4a43CE350Bb7fDF7c/0x1dd80b503e3b5de5724fe204bc87fb5387b0470c
+curl -s -X POST http://123.206.29.15:4100/api/v1/view/create/13810167616/0x12f91a58bf2714ec602f3c3b9841Ddf98478DFF0/0x13e55998e931687c1a19d6281d58fb3622e5c6fc
 
 - /view/delete/:userid/:address/:tokenaddress
 
@@ -100,4 +104,8 @@ curl http://123.206.29.15:4100/api/v1/view/info/13810167616/0x20B5c492B53919e4bf
 
 - /view/list/:userid/:address
 
-curl http://123.206.29.15:4100/api/v1/view/list/13810167616/0x20B5c492B53919e4bfC279C4a43CE350Bb7fDF7c
+curl http://123.206.29.15:4100/api/v1/view/list/13810167616/0x12f91a58bf2714ec602f3c3b9841Ddf98478DFF0
+
+- /view/balance/:userid/:address
+
+curl http://123.206.29.15:4100/api/v1/view/balance/13810167616/0x12f91a58bf2714ec602f3c3b9841Ddf98478DFF0

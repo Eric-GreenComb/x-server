@@ -23,13 +23,13 @@ func CreateUserAddressTokens(c *gin.Context) {
 
 	_, err := persist.GetPersist().GetUserAddressTokens(_userID, _address, _tokenaddress)
 	if err == nil {
-		c.JSON(200, gin.H{"errcode": 0, "msg": "OK"})
+		c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": "OK"})
 		return
 	}
 
 	token, err := persist.GetPersist().TokenInfo(_tokenaddress)
 	if err != nil {
-		c.JSON(422, gin.H{"errcode": 1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 
@@ -44,7 +44,7 @@ func CreateUserAddressTokens(c *gin.Context) {
 	err = persist.GetPersist().CreateUserAddressTokens(userAddressToken)
 
 	if err != nil {
-		c.JSON(422, gin.H{"errcode": 1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 	} else {
 		c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": userAddressToken})
 	}
@@ -59,7 +59,7 @@ func DeleteUserAddressTokens(c *gin.Context) {
 
 	err := persist.GetPersist().DeleteUserAddressTokens(_userID, _address, _tokenaddress)
 	if err != nil {
-		c.JSON(422, gin.H{"errcode": 1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 
@@ -75,7 +75,7 @@ func GetUserAddressTokens(c *gin.Context) {
 
 	userAddressTokens, err := persist.GetPersist().GetUserAddressTokens(_userID, _address, _tokenaddress)
 	if err != nil {
-		c.JSON(422, gin.H{"errcode": 1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 
@@ -91,7 +91,7 @@ func ListUserAddressTokens(c *gin.Context) {
 	userAddressTokens, err := persist.GetPersist().ListUserAddressTokens(_userID, _address)
 
 	if err != nil {
-		c.JSON(422, gin.H{"errcode": 1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 
@@ -107,7 +107,7 @@ func ListUserAddressTokenBanlance(c *gin.Context) {
 	userAddressTokens, err := persist.GetPersist().ListUserAddressTokens(_userID, _address)
 
 	if err != nil {
-		c.JSON(422, gin.H{"errcode": 1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 

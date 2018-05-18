@@ -19,12 +19,12 @@ func CreateUser(c *gin.Context) {
 	c.Bind(&user)
 
 	if user.UserID == "" || user.Passwd == "" || user.Name == "" {
-		c.JSON(422, gin.H{"errcode": 1, "msg": "There are some empty fields."})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": "There are some empty fields."})
 		return
 	}
 
 	if !regexp.IsMobile(user.UserID) {
-		c.JSON(422, gin.H{"errcode": 1, "msg": "UserID must phone number."})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": "UserID must phone number."})
 		return
 	}
 
@@ -34,7 +34,7 @@ func CreateUser(c *gin.Context) {
 	err := persist.GetPersist().CreateUser(user)
 
 	if err != nil {
-		c.JSON(422, gin.H{"errcode": 1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 	} else {
 		c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": user})
 	}
@@ -48,7 +48,7 @@ func UserInfo(c *gin.Context) {
 	user, err := persist.GetPersist().UserInfo(_userid)
 
 	if err != nil {
-		c.JSON(422, gin.H{"errcode": 1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 
@@ -64,7 +64,7 @@ func UpdateUserPasswd(c *gin.Context) {
 
 	_, err := persist.GetPersist().Login(_userid, _old)
 	if err != nil {
-		c.JSON(422, gin.H{"errcode": 1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 
@@ -73,7 +73,7 @@ func UpdateUserPasswd(c *gin.Context) {
 
 	err = persist.GetPersist().UpdateUserPasswd(_userid, newPasswd)
 	if err != nil {
-		c.JSON(422, gin.H{"errcode": 1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 

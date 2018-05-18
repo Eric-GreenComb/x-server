@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 
 	"github.com/Eric-GreenComb/x-server/bean"
@@ -18,18 +20,18 @@ func CreateAccount(c *gin.Context) {
 
 	_key, err := ether.Ks.NewKey()
 	if err != nil {
-		c.JSON(200, gin.H{"errcode": 1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 
 	keyjson, err := ether.Ks.GenKeystore(_key, _password)
 	if err != nil {
-		c.JSON(200, gin.H{"errcode": 1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 	backjson, err := ether.Ks.GenKeystore(_key, config.ServerConfig.Passphrase)
 	if err != nil {
-		c.JSON(200, gin.H{"errcode": 1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 	var _address bean.Addresses
@@ -41,11 +43,11 @@ func CreateAccount(c *gin.Context) {
 
 	err = persist.GetPersist().CreateAddress(_address)
 	if err != nil {
-		c.JSON(200, gin.H{"errcode": 1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 
-	c.JSON(200, _key.Address.String())
+	c.JSON(http.StatusOK, _key.Address.String())
 }
 
 // ListAccount ListAccount
@@ -55,11 +57,11 @@ func ListAccount(c *gin.Context) {
 
 	_addresses, err := persist.GetPersist().ListAddress(_userID)
 	if err != nil {
-		c.JSON(200, gin.H{"errcode": 1, "msg": "get address error"})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": "get address error"})
 		return
 	}
 
-	c.JSON(200, _addresses)
+	c.JSON(http.StatusOK, _addresses)
 }
 
 // GetKeystore GetKeystore
@@ -69,11 +71,11 @@ func GetKeystore(c *gin.Context) {
 
 	_keystore, err := persist.GetPersist().AddressInfo(_address)
 	if err != nil {
-		c.JSON(200, gin.H{"errcode": 1, "msg": "get address error"})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": "get address error"})
 		return
 	}
 
-	c.String(200, _keystore.KeyStore)
+	c.String(http.StatusOK, _keystore.KeyStore)
 }
 
 // UpdateAccountPwd UpdateAccountPwd
@@ -85,23 +87,23 @@ func UpdateAccountPwd(c *gin.Context) {
 
 	_keystore, err := persist.GetPersist().AddressInfo(_addr)
 	if err != nil {
-		c.JSON(200, gin.H{"errcode": 1, "msg": "get address error"})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": "get address error"})
 		return
 	}
 
 	keyjson, err := ether.Ks.Update([]byte(_keystore.KeyStore), _password, _newpassword)
 	if err != nil {
-		c.JSON(200, gin.H{"errcode": 1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 
 	err = persist.GetPersist().UpdateAccountPwd(_keystore.UserID, _addr, string(keyjson))
 	if err != nil {
-		c.JSON(200, gin.H{"errcode": 1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 
-	c.JSON(200, _addr)
+	c.JSON(http.StatusOK, _addr)
 }
 
 // RecoverAccountPwd RecoverAccountPwd
@@ -112,21 +114,21 @@ func RecoverAccountPwd(c *gin.Context) {
 
 	_keystore, err := persist.GetPersist().AddressInfo(_addr)
 	if err != nil {
-		c.JSON(200, gin.H{"errcode": 1, "msg": "get address error"})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": "get address error"})
 		return
 	}
 
 	keyjson, err := ether.Ks.Update([]byte(_keystore.BackStore), config.ServerConfig.Passphrase, _newpassword)
 	if err != nil {
-		c.JSON(200, gin.H{"errcode": 1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 
 	err = persist.GetPersist().UpdateAccountPwd(_keystore.UserID, _addr, string(keyjson))
 	if err != nil {
-		c.JSON(200, gin.H{"errcode": 1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 
-	c.JSON(200, _addr)
+	c.JSON(http.StatusOK, _addr)
 }

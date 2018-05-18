@@ -30,26 +30,26 @@ func DeployToken(c *gin.Context) {
 
 	_int64, err := strconv.ParseInt(_total, 10, 64)
 	if err != nil {
-		c.String(200, err.Error())
+		c.String(http.StatusOK, err.Error())
 		return
 	}
 
 	_keystore, err := persist.GetPersist().AddressInfo(_address)
 	if err != nil {
-		c.JSON(200, gin.H{"errcode": 1, "msg": "get address error"})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": "get address error"})
 		return
 	}
 
 	txOpt, err := bind.NewTransactor(strings.NewReader(_keystore.KeyStore), _pwd)
 	if err != nil {
-		c.String(200, err.Error())
+		c.String(http.StatusOK, err.Error())
 		return
 	}
 
 	_initialAmount := big.NewInt(_int64)
 	_tokenAddress, _, _, err := token.DeployHumanStandardToken(txOpt, ether.GetEthClient(), _initialAmount, _name, 10, _symbol)
 	if err != nil {
-		c.String(200, err.Error())
+		c.String(http.StatusOK, err.Error())
 		return
 	}
 
@@ -69,11 +69,11 @@ func DeployToken(c *gin.Context) {
 
 	err = persist.GetPersist().CreateToken(_tokens)
 	if err != nil {
-		c.JSON(200, gin.H{"errcode": 1, "msg": "create token error"})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": "create token error"})
 		return
 	}
 
-	c.JSON(200, address)
+	c.JSON(http.StatusOK, address)
 }
 
 // BalanceOfToken BalanceOfToken
@@ -105,7 +105,7 @@ func BalanceOfToken(c *gin.Context) {
 		tokenValues = append(tokenValues, tokenValue)
 	}
 
-	c.JSON(200, tokenValues)
+	c.JSON(http.StatusOK, tokenValues)
 }
 
 // TransferToken TransferToken
@@ -120,19 +120,19 @@ func TransferToken(c *gin.Context) {
 
 	_int64, err := strconv.ParseInt(_amount, 10, 64)
 	if err != nil {
-		c.String(200, err.Error())
+		c.String(http.StatusOK, err.Error())
 		return
 	}
 
 	_keystore, err := persist.GetPersist().AddressInfo(_from)
 	if err != nil {
-		c.JSON(200, gin.H{"errcode": 1, "msg": "get address error"})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": "get address error"})
 		return
 	}
 
 	txOpt, err := bind.NewTransactor(strings.NewReader(_keystore.KeyStore), _pwd)
 	if err != nil {
-		c.String(200, err.Error())
+		c.String(http.StatusOK, err.Error())
 		return
 	}
 	ts, _ := token.NewHumanStandardTokenTransactor(common.HexToAddress(_conaddr), ether.GetEthClient())
@@ -140,7 +140,7 @@ func TransferToken(c *gin.Context) {
 	_bigint := big.NewInt(_int64)
 	_, err = ts.Transfer(txOpt, common.HexToAddress(_to), _bigint)
 	if err != nil {
-		c.String(200, err.Error())
+		c.String(http.StatusOK, err.Error())
 		return
 	}
 
@@ -155,7 +155,7 @@ func TransferToken(c *gin.Context) {
 
 	err = persist.GetPersist().CreateTokenTransfer(_transfer)
 	if err != nil {
-		c.JSON(200, gin.H{"errcode": 1, "msg": "create token error"})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": "create token error"})
 		return
 	}
 
@@ -175,11 +175,11 @@ func CreateToken(c *gin.Context) {
 
 	err := persist.GetPersist().CreateToken(_tokens)
 	if err != nil {
-		c.JSON(200, gin.H{"errcode": 1, "msg": "create token error"})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": "create token error"})
 		return
 	}
 
-	c.JSON(200, _tokens)
+	c.JSON(http.StatusOK, _tokens)
 }
 
 // TokenInfo TokenInfo
@@ -190,7 +190,7 @@ func TokenInfo(c *gin.Context) {
 	token, err := persist.GetPersist().TokenInfo(_address)
 
 	if err != nil {
-		c.JSON(422, gin.H{"errcode": 1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 
@@ -202,20 +202,20 @@ func UpdateTokenWeight(c *gin.Context) {
 	_address := c.Params.ByName("address")
 	_weight := c.Params.ByName("weight")
 	if _address == "" || _weight == "" {
-		c.JSON(422, gin.H{"errcode": 1, "msg": "There are some empty fields."})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": "There are some empty fields."})
 		return
 	}
 
 	_iWeight, err := strconv.Atoi(_weight)
 	if err != nil {
-		c.JSON(422, gin.H{"errcode": 1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 
 	if err := persist.GetPersist().UpdateTokenWeight(_address, _iWeight); err != nil {
-		c.JSON(406, gin.H{"errcode": 1, "msg": "update weight error."})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": "update weight error."})
 	} else {
-		c.JSON(200, gin.H{"errcode": 0, "msg": "success"})
+		c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": "success"})
 	}
 }
 
@@ -226,7 +226,7 @@ func ListToken(c *gin.Context) {
 
 	_tokens, err := persist.GetPersist().ListToken(_nPage)
 	if err != nil {
-		c.JSON(406, gin.H{"errcode": 1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": _tokens})
@@ -240,11 +240,11 @@ func CreateTokenTransfer(c *gin.Context) {
 
 	err := persist.GetPersist().CreateTokenTransfer(_transfer)
 	if err != nil {
-		c.JSON(200, gin.H{"errcode": 1, "msg": "create token error"})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": "create token error"})
 		return
 	}
 
-	c.JSON(200, _transfer)
+	c.JSON(http.StatusOK, _transfer)
 }
 
 // ListTokenTransfer ListTokenTransfer
@@ -272,7 +272,7 @@ func AllTokenTransfer(c *gin.Context) {
 
 	_transfers, err := persist.GetPersist().AllTokenTransfer(_tokenaddress, _nPage)
 	if err != nil {
-		c.JSON(406, gin.H{"errcode": 1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": _transfers})
@@ -285,7 +285,7 @@ func CountTokenTransfer(c *gin.Context) {
 
 	_count, err := persist.GetPersist().CountTokenTransfer(_tokenaddress)
 	if err != nil {
-		c.JSON(406, gin.H{"errcode": 1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": _count})
