@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/sha256"
 	"fmt"
 	"net/http"
 	"time"
@@ -24,7 +25,10 @@ func Login(c *gin.Context) {
 
 	fmt.Println(_user)
 
-	user, err := persist.GetPersist().Login(_user.UserID, _user.Passwd)
+	sum := sha256.Sum256([]byte(_user.Passwd))
+	_pwd := fmt.Sprintf("%x", sum)
+
+	user, err := persist.GetPersist().Login(_user.UserID, _pwd)
 	if err != nil {
 		AbortWithError(c, http.StatusInternalServerError, "DB Query Error", bean.Realm)
 		return

@@ -8,9 +8,9 @@ token x server
 
 curl -s -X POST http://123.206.29.15:4100/api/v1/users/create -d 'userID=13810167616&passwd=a11111&name=eric&email=ministor@126.com'
 
-- login passwd为passwd的 sha256 hash
+- login passwd
 
-curl -s -X POST http://123.206.29.15:4100/login -d 'userID=13810167616&passwd=0fb6c6c0b7621fb7bd6ff1e6fb656bc746e2254a4f671dee25c0ce3ddd9ccf3e'
+curl -s -X POST http://123.206.29.15:4100/login -d 'userID=13810167616&passwd=a11111'
 
 - user info
 
