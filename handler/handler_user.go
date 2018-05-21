@@ -15,28 +15,39 @@ import (
 // CreateUser Create User
 func CreateUser(c *gin.Context) {
 
-	user := bean.Users{}
-	c.Bind(&user)
+	_userID := c.PostForm("userID")
+	_name := c.PostForm("name")
+	_passwd := c.PostForm("passwd")
+	_email := c.PostForm("email")
+	fmt.Println("userID : " + _userID)
 
-	if user.UserID == "" || user.Passwd == "" || user.Name == "" {
+	if _userID == "" || _name == "" || _passwd == "" {
 		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": "There are some empty fields."})
 		return
 	}
 
-	if !regexp.IsMobile(user.UserID) {
+	if !regexp.IsMobile(_userID) {
 		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": "UserID must phone number."})
 		return
 	}
 
-	sum := sha256.Sum256([]byte(user.Passwd))
-	user.Passwd = fmt.Sprintf("%x", sum)
+	fmt.Println("create user")
 
-	err := persist.GetPersist().CreateUser(user)
+	sum := sha256.Sum256([]byte(_passwd))
+	_Passwd := fmt.Sprintf("%x", sum)
+
+	var _user bean.Users
+	_user.UserID = _userID
+	_user.Name = _name
+	_user.Passwd = _Passwd
+	_user.Email = _email
+
+	err := persist.GetPersist().CreateUser(_user)
 
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": user})
+		c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": _user})
 	}
 }
 
