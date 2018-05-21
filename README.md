@@ -8,6 +8,8 @@ token x server
 
 curl -s -X POST http://123.206.29.15:4100/api/v1/users/create -d 'userID=13810167616&passwd=a11111&name=eric&email=ministor@126.com'
 
+curl -s -X POST http://123.206.29.15:4100/api/v1/users/create -d 'userID=18810096114&passwd=a11111&name=eric&email=ministor@126.com'
+
 - login passwd
 
 curl -s -X POST http://123.206.29.15:4100/login -d 'userID=13810167616&passwd=a11111'
@@ -48,7 +50,7 @@ curl -s -X POST http://123.206.29.15:4100/api/v1/account/recover/0x12f91a58bf271
 
 - deploy token /token/deploy
 
-curl -s -X POST http://123.206.29.15:4100/api/v1/token/deploy -d 'address=0x12f91a58bf2714ec602f3c3b9841Ddf98478DFF0&pwd=a11111&name=歌手A&symbol=STA&total=1000000000&desc=歌手A发的Token'
+curl -s -X POST http://123.206.29.15:4100/api/v1/token/deploy -d 'address=0x12f91a58bf2714ec602f3c3b9841Ddf98478DFF0&pwd=a11111&name=歌手C&symbol=STC&total=1000000000&desc=歌手C发的Token'
 
 return 0x13e55998e931687c1a19d6281d58fb3622e5c6fc
 
@@ -58,11 +60,11 @@ return 0x8092e36cbbf1be3095fa1e19daf418dc79ce31d5
 
 - balance /token/balance/:addr
 
-curl -s -X POST http://123.206.29.15:4100/api/v1/token/balance/0x12f91a58bf2714ec602f3c3b9841Ddf98478DFF0 -d 'conaddrs=0x13e55998e931687c1a19d6281d58fb3622e5c6fc,0x8092e36cbbf1be3095fa1e19daf418dc79ce31d5,0xa6e40695a50fae5f934298124e241224d37fd8bb,0xb3804f741937595475bb7e8e46e7645613a5705a'
+curl -s -X POST http://123.206.29.15:4100/api/v1/token/balance/0x12f91a58bf2714ec602f3c3b9841Ddf98478DFF0 -d 'conaddrs=0x387127e92e95f492f84f28446cf542ad85d43bbf,0x8092e36cbbf1be3095fa1e19daf418dc79ce31d5,0xa6e40695a50fae5f934298124e241224d37fd8bb,0xb3804f741937595475bb7e8e46e7645613a5705a'
 
 - transfer /token/transfer
 
-curl -s -X POST http://123.206.29.15:4100/api/v1/token/transfer -d 'conaddr=0x13e55998e931687c1a19d6281d58fb3622e5c6fc&from=0x12f91a58bf2714ec602f3c3b9841Ddf98478DFF0&to=0xeca4635f3fE81b4b8Cc6d40deFf99Eb8428C7BeD&amount=1000&pwd=a11111&memo=loan'
+curl -s -X POST http://123.206.29.15:4100/api/v1/token/transfer -d 'conaddr=0x387127e92e95f492f84f28446cf542ad85d43bbf&from=0xBA168bB12b41d8c28b5D0266038dE1a387654032&to=0x12f91a58bf2714ec602f3c3b9841Ddf98478DFF0&amount=1000&pwd=a11111&memo=loan'
 
 - /token/transfer/list/:tokenaddress/:address/:page
 

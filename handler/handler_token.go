@@ -124,6 +124,22 @@ func TransferToken(c *gin.Context) {
 		return
 	}
 
+	_caller, err := token.NewHumanStandardTokenCaller(common.HexToAddress(_conaddr), ether.GetEthClient())
+	if err != nil {
+		fmt.Println("Caller Error : " + err.Error())
+	}
+	_nBalance, err := _caller.BalanceOf(&bind.CallOpts{Pending: true}, common.HexToAddress(_from))
+	if err != nil {
+		fmt.Println("BalanceOf Error : " + err.Error())
+	}
+
+	fmt.Println(_nBalance)
+	fmt.Println(_int64)
+	if _nBalance.Uint64() < uint64(_int64) {
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": "余额不足"})
+		return
+	}
+
 	_keystore, err := persist.GetPersist().AddressInfo(_from)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": "get address error"})
@@ -135,7 +151,12 @@ func TransferToken(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
-	ts, _ := token.NewHumanStandardTokenTransactor(common.HexToAddress(_conaddr), ether.GetEthClient())
+
+	ts, err := token.NewHumanStandardTokenTransactor(common.HexToAddress(_conaddr), ether.GetEthClient())
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
+		return
+	}
 
 	_bigint := big.NewInt(_int64)
 	_, err = ts.Transfer(txOpt, common.HexToAddress(_to), _bigint)
