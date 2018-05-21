@@ -62,7 +62,10 @@ func UpdateUserPasswd(c *gin.Context) {
 	_old := c.Params.ByName("old")
 	_new := c.Params.ByName("new")
 
-	_, err := persist.GetPersist().Login(_userid, _old)
+	sumOld := sha256.Sum256([]byte(_old))
+	oldPasswd := fmt.Sprintf("%x", sumOld)
+
+	_, err := persist.GetPersist().Login(_userid, oldPasswd)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return

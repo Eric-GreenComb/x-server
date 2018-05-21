@@ -58,7 +58,7 @@ type Users struct {
 type UserAddressTokens struct {
 	gorm.Model
 	UserID       string `gorm:"not null" form:"userID" json:"userID"`             // 手机号码
-	Address      string `gorm:";unique" form:"address" json:"address"`            // 用户地址
+	Address      string `gorm:"not null" form:"address" json:"address"`           // 用户地址
 	ESN          string `gorm:"not null" form:"esn" json:"esn"`                   // 生态SN
 	TokenAddress string `gorm:"not null" form:"tokenaddress" json:"tokenaddress"` // Token合约地址
 	Name         string `gorm:"not null" form:"name" json:"name"`                 // Token合约名称

@@ -132,7 +132,7 @@ func TransferToken(c *gin.Context) {
 
 	txOpt, err := bind.NewTransactor(strings.NewReader(_keystore.KeyStore), _pwd)
 	if err != nil {
-		c.String(http.StatusOK, err.Error())
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 	ts, _ := token.NewHumanStandardTokenTransactor(common.HexToAddress(_conaddr), ether.GetEthClient())
@@ -140,7 +140,7 @@ func TransferToken(c *gin.Context) {
 	_bigint := big.NewInt(_int64)
 	_, err = ts.Transfer(txOpt, common.HexToAddress(_to), _bigint)
 	if err != nil {
-		c.String(http.StatusOK, err.Error())
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 
