@@ -57,6 +57,47 @@ func Login(c *gin.Context) {
 	})
 }
 
+// AdminLogin AdminLogin
+func AdminLogin(c *gin.Context) {
+	var _adminUser bean.AdminUsers
+
+	if c.Bind(&_adminUser) != nil {
+		AbortWithError(c, http.StatusBadRequest, "Missing usename or password", bean.Realm)
+		return
+	}
+
+	sum := sha256.Sum256([]byte(_adminUser.Passwd))
+	_pwd := fmt.Sprintf("%x", sum)
+
+	user, err := persist.GetPersist().AdminLogin(_adminUser.UserID, _pwd)
+	if err != nil {
+		AbortWithError(c, http.StatusInternalServerError, "DB Query Error", bean.Realm)
+		return
+	}
+
+	expire := time.Now().Add(bean.ExpireTime)
+	// Create the token
+	token := jwt.New(jwt.SigningMethodHS256)
+	// Set some claims
+	claims := make(jwt.MapClaims)
+	claims["sub"] = user.UserID
+	claims["exp"] = expire.Unix()
+	claims["iat"] = time.Now().Unix()
+	token.Claims = claims
+
+	// Sign and get the complete encoded token as a string
+	tokenString, err := token.SignedString([]byte(bean.JWTSigningKey))
+	if err != nil {
+		AbortWithError(c, http.StatusUnauthorized, "Create JWT Token faild", bean.Realm)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"token":  tokenString,
+		"expire": expire.Format(time.RFC3339),
+	})
+}
+
 // JWTAuth JWTAuth
 func JWTAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {

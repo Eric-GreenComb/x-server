@@ -52,6 +52,8 @@ func main() {
 		r1.POST("/users/create", handler.CreateUser)
 		r1.GET("/users/:userid", handler.UserInfo)
 		r1.POST("/users/updatepasswd/:userid/:old/:new", handler.UpdateUserPasswd)
+		r1.GET("/user/list/:search/:page", handler.ListUser)
+		r1.GET("/user/count", handler.CountUser)
 
 		// 账户
 		r1.POST("/account/create/:userid/:name/:password", handler.CreateAccount)
@@ -75,12 +77,16 @@ func main() {
 		r1.POST("/token/create", handler.CreateToken)
 		r1.GET("/token/info/:address", handler.TokenInfo)
 		r1.POST("/token/weight/:address/:weight", handler.UpdateTokenWeight)
-		r1.GET("/token/list/:page", handler.ListToken)
+		r1.GET("/token/list/:search/:page", handler.ListToken)
+		r1.GET("/token/count", handler.CountToken)
+
 		// db - transfer
 		r1.POST("/token/transfer/create", handler.CreateTokenTransfer)
 		r1.GET("/token/transfer/list/:tokenaddress/:address/:page", handler.ListTokenTransfer)
 		r1.GET("/token/transfer/all/:tokenaddress/:page", handler.AllTokenTransfer)
 		r1.GET("/token/transfer/count/:tokenaddress", handler.CountTokenTransfer)
+		r1.GET("/token/transfer/allcount", handler.CountAllTokenTransfer)
+		r1.GET("/token/transfer/allsum", handler.SumAllTokenTransfer)
 
 		r1.POST("/badger/set/:key/:value", handler.SetBadgerKey)
 		r1.POST("/badger/setwithttl/:key/:value", handler.SetBadgerKeyTTL)
@@ -94,6 +100,15 @@ func main() {
 		r2.GET("/hello", handler.GetHello)
 		r2.POST("/hello", handler.PostHello)
 		r2.GET("/refresh_token", RefreshToken)
+	}
+
+	// admin api
+	r3 := router.Group("/api/admin/v1")
+	{
+		r3.POST("/users/create", handler.CreateAdminUser)
+		r3.GET("/users/:userid", handler.AdminUserInfo)
+		r3.POST("/users/updatepasswd/:userid/:old/:new", handler.UpdateAdminUserPasswd)
+		r3.POST("login", AdminLogin)
 	}
 
 	for _, _port := range config.ServerConfig.Port {

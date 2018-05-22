@@ -20,7 +20,7 @@ import (
 // DeployToken DeployToken
 func DeployToken(c *gin.Context) {
 
-	_address := c.PostForm("address")
+	_userID := c.PostForm("userID")
 	_pwd := c.PostForm("pwd")
 
 	_name := c.PostForm("name")
@@ -34,7 +34,15 @@ func DeployToken(c *gin.Context) {
 		return
 	}
 
-	_keystore, err := persist.GetPersist().AddressInfo(_address)
+	_addresses, err := persist.GetPersist().ListAddress(_userID)
+	if err != nil || len(_addresses) == 0 {
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": "get user address error"})
+		return
+	}
+
+	fmt.Println(_addresses[0].Address)
+
+	_keystore, err := persist.GetPersist().AddressInfo(_addresses[0].Address)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": "get address error"})
 		return
@@ -63,7 +71,8 @@ func DeployToken(c *gin.Context) {
 	_tokens.Symbol = _symbol
 	_tokens.Total = _int64
 	_tokens.Desc = _desc
-	_tokens.Owner = _address
+	_tokens.UserID = _userID
+	_tokens.Owner = _addresses[0].Address
 	_tokens.Weight = 0
 	_tokens.Status = 0
 
@@ -242,15 +251,30 @@ func UpdateTokenWeight(c *gin.Context) {
 
 // ListToken ListToken
 func ListToken(c *gin.Context) {
+	_search := c.Params.ByName("search")
 	_page := c.Params.ByName("page")
 	_nPage, _ := strconv.Atoi(_page)
 
-	_tokens, err := persist.GetPersist().ListToken(_nPage)
+	fmt.Println(_search)
+	fmt.Println(_page)
+
+	_tokens, err := persist.GetPersist().ListToken(_search, _nPage)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": _tokens})
+}
+
+// CountToken CountToken
+func CountToken(c *gin.Context) {
+
+	_count, err := persist.GetPersist().CountToken()
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": _count})
 }
 
 // CreateTokenTransfer CreateTokenTransfer
@@ -305,6 +329,28 @@ func CountTokenTransfer(c *gin.Context) {
 	_tokenaddress := c.Params.ByName("tokenaddress")
 
 	_count, err := persist.GetPersist().CountTokenTransfer(_tokenaddress)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": _count})
+}
+
+// CountAllTokenTransfer CountAllTokenTransfer
+func CountAllTokenTransfer(c *gin.Context) {
+
+	_count, err := persist.GetPersist().CountAllTokenTransfer()
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": _count})
+}
+
+// SumAllTokenTransfer SumAllTokenTransfer
+func SumAllTokenTransfer(c *gin.Context) {
+
+	_count, err := persist.GetPersist().SumAllTokenTransfer()
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return

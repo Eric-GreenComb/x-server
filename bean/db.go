@@ -29,7 +29,8 @@ type Tokens struct {
 	Symbol  string `gorm:"not null" form:"symbol" json:"symbol"`   // Token合约symbol
 	Total   int64  `gorm:"not null" form:"total" json:"total"`     // Token合约total
 	Desc    string `gorm:"not null" form:"desc" json:"desc"`       // Token合约描述
-	Owner   string `gorm:"not null" form:"owner" json:"owner"`     // Token合约发行者
+	UserID  string `gorm:"not null" form:"userID" json:"userID"`   // Token合约发行者
+	Owner   string `gorm:"not null" form:"owner" json:"owner"`     // Token合约发行者地址
 	Weight  int    `gorm:"not null" form:"weight" json:"weight"`   // Token合约权重
 	Status  int8   `gorm:"not null" form:"status" json:"status"`   // Token合约状态
 }
@@ -57,6 +58,12 @@ type User struct {
 	Name   string `gorm:"not null" form:"name" json:"name"`
 	Passwd string `gorm:"not null" form:"passwd" json:"passwd"`
 	Email  string `gorm:"not null" form:"email" json:"email"`
+}
+
+// AdminUsers AdminUsers
+type AdminUsers struct {
+	gorm.Model
+	User
 }
 
 // UserAddressTokens UserAddressTokens

@@ -70,5 +70,10 @@ func InitDatabase() {
 		db.Set("gorm:table_options", "ENGINE=InnoDB").CreateTable(&bean.Addresses{})
 	}
 
+	if !db.HasTable(&bean.AdminUsers{}) {
+		db.CreateTable(&bean.AdminUsers{})
+		db.Set("gorm:table_options", "ENGINE=InnoDB").CreateTable(&bean.AdminUsers{})
+	}
+
 	return
 }

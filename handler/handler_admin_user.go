@@ -4,7 +4,6 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 
@@ -13,14 +12,13 @@ import (
 	"github.com/Eric-GreenComb/x-server/regexp"
 )
 
-// CreateUser Create User
-func CreateUser(c *gin.Context) {
+// CreateAdminUser CreateAdminUser
+func CreateAdminUser(c *gin.Context) {
 
 	_userID := c.PostForm("userID")
 	_name := c.PostForm("name")
 	_passwd := c.PostForm("passwd")
 	_email := c.PostForm("email")
-	fmt.Println("userID : " + _userID)
 
 	if _userID == "" || _name == "" || _passwd == "" {
 		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": "There are some empty fields."})
@@ -32,18 +30,16 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	fmt.Println("create user")
-
 	sum := sha256.Sum256([]byte(_passwd))
 	_Passwd := fmt.Sprintf("%x", sum)
 
-	var _user bean.Users
+	var _user bean.AdminUsers
 	_user.UserID = _userID
 	_user.Name = _name
 	_user.Passwd = _Passwd
 	_user.Email = _email
 
-	err := persist.GetPersist().CreateUser(_user)
+	err := persist.GetPersist().CreateAdminUser(_user)
 
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
@@ -52,12 +48,12 @@ func CreateUser(c *gin.Context) {
 	}
 }
 
-// UserInfo User Info
-func UserInfo(c *gin.Context) {
+// AdminUserInfo AdminUserInfo
+func AdminUserInfo(c *gin.Context) {
 
 	_userid := c.Params.ByName("userid")
 
-	user, err := persist.GetPersist().UserInfo(_userid)
+	user, err := persist.GetPersist().AdminUserInfo(_userid)
 
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
@@ -67,8 +63,8 @@ func UserInfo(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": user})
 }
 
-// UpdateUserPasswd Update User Passwd
-func UpdateUserPasswd(c *gin.Context) {
+// UpdateAdminUserPasswd UpdateAdminUserPasswd
+func UpdateAdminUserPasswd(c *gin.Context) {
 
 	_userid := c.Params.ByName("userid")
 	_old := c.Params.ByName("old")
@@ -77,7 +73,7 @@ func UpdateUserPasswd(c *gin.Context) {
 	sumOld := sha256.Sum256([]byte(_old))
 	oldPasswd := fmt.Sprintf("%x", sumOld)
 
-	_, err := persist.GetPersist().Login(_userid, oldPasswd)
+	_, err := persist.GetPersist().AdminLogin(_userid, oldPasswd)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
@@ -86,38 +82,11 @@ func UpdateUserPasswd(c *gin.Context) {
 	sum := sha256.Sum256([]byte(_new))
 	newPasswd := fmt.Sprintf("%x", sum)
 
-	err = persist.GetPersist().UpdateUserPasswd(_userid, newPasswd)
+	err = persist.GetPersist().UpdateAdminUserPasswd(_userid, newPasswd)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": "success"})
-}
-
-// CountUser User Count
-func CountUser(c *gin.Context) {
-
-	_count, err := persist.GetPersist().CountUser()
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": _count})
-}
-
-// ListUser ListUser
-func ListUser(c *gin.Context) {
-
-	_search := c.Params.ByName("search")
-	_page := c.Params.ByName("page")
-	_nPage, _ := strconv.Atoi(_page)
-
-	_users, err := persist.GetPersist().ListUser(_search, _nPage)
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": "get users error"})
-		return
-	}
-
-	c.JSON(http.StatusOK, _users)
 }

@@ -26,7 +26,7 @@ func (persist *Persist) UpdateTokenWeight(addr string, weight int) error {
 }
 
 // ListToken ListToken
-func (persist *Persist) ListToken(page int) ([]bean.Tokens, error) {
+func (persist *Persist) ListToken(search string, page int) ([]bean.Tokens, error) {
 
 	var tokens []bean.Tokens
 
@@ -39,12 +39,26 @@ func (persist *Persist) ListToken(page int) ([]bean.Tokens, error) {
 
 	var err error
 
-	err = persist.db.Table("tokens").Order("weight desc").Limit(config.ServerConfig.ViewLimit).Offset(_0ffset).Find(&tokens).Error
+	if len(search) == 0 {
+		err = persist.db.Table("tokens").Order("weight desc").Limit(config.ServerConfig.ViewLimit).Offset(_0ffset).Find(&tokens).Error
+		return tokens, nil
+	}
+
+	err = persist.db.Table("tokens").Where("user_id like ?", "%"+search+"%").Order("weight desc").Limit(config.ServerConfig.ViewLimit).Offset(_0ffset).Find(&tokens).Error
+	return tokens, err
+}
+
+// CountToken CountToken
+func (persist *Persist) CountToken() (uint64, error) {
+
+	var value uint64
+	err := persist.db.Table("tokens").Count(&value).Error
 
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
-	return tokens, nil
+	return value, nil
+
 }
 
 // CreateTokenTransfer CreateTokenTransfer Persist
@@ -107,4 +121,34 @@ func (persist *Persist) CountTokenTransfer(tokenAddr string) (uint64, error) {
 		return 0, err
 	}
 	return value, nil
+}
+
+// CountAllTokenTransfer CountAllTokenTransfer
+func (persist *Persist) CountAllTokenTransfer() (uint64, error) {
+
+	var value uint64
+	err := persist.db.Table("token_transfers").Count(&value).Error
+
+	if err != nil {
+		return 0, err
+	}
+	return value, nil
+}
+
+// Result Result
+type Result struct {
+	Total int
+}
+
+// SumAllTokenTransfer SumAllTokenTransfer
+func (persist *Persist) SumAllTokenTransfer() (int, error) {
+
+	var result Result
+
+	err := persist.db.Table("token_transfers").Select("sum(amount) as total").Scan(&result).Error
+
+	if err != nil {
+		return 0, err
+	}
+	return result.Total, nil
 }
