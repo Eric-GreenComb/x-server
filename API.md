@@ -82,7 +82,7 @@ return 0x573d52f6547ca177384ad763e4435ce7b566b9f7
 
 curl -s -X POST http://123.206.29.15:4100/api/v1/token/deploy -d 'userID=13810167616&pwd=a11111&name=歌手A&symbol=STA&total=1000000000&desc=歌手A发的Token'
 
-return 0xc8d5357c4a0857f265a8b0d4185c00ae7e817954
+return 0xb6a7020cd84fa6b5ed6b558fb4781f81080828de
 
 - balance /token/balance/:addr
 

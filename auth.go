@@ -62,7 +62,7 @@ func AdminLogin(c *gin.Context) {
 	var _adminUser bean.AdminUsers
 
 	if c.Bind(&_adminUser) != nil {
-		AbortWithError(c, http.StatusBadRequest, "Missing usename or password", bean.Realm)
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": "bind user error."})
 		return
 	}
 
@@ -71,7 +71,7 @@ func AdminLogin(c *gin.Context) {
 
 	user, err := persist.GetPersist().AdminLogin(_adminUser.UserID, _pwd)
 	if err != nil {
-		AbortWithError(c, http.StatusInternalServerError, "DB Query Error", bean.Realm)
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": "user or pwd error."})
 		return
 	}
 
@@ -88,13 +88,14 @@ func AdminLogin(c *gin.Context) {
 	// Sign and get the complete encoded token as a string
 	tokenString, err := token.SignedString([]byte(bean.JWTSigningKey))
 	if err != nil {
-		AbortWithError(c, http.StatusUnauthorized, "Create JWT Token faild", bean.Realm)
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": "Create JWT Token faild."})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"token":  tokenString,
-		"expire": expire.Format(time.RFC3339),
+		"errcode": 0,
+		"token":   tokenString,
+		"expire":  expire.Format(time.RFC3339),
 	})
 }
 

@@ -30,7 +30,7 @@ func DeployToken(c *gin.Context) {
 
 	_int64, err := strconv.ParseInt(_total, 10, 64)
 	if err != nil {
-		c.String(http.StatusOK, err.Error())
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 
@@ -50,14 +50,14 @@ func DeployToken(c *gin.Context) {
 
 	txOpt, err := bind.NewTransactor(strings.NewReader(_keystore.KeyStore), _pwd)
 	if err != nil {
-		c.String(http.StatusOK, err.Error())
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 
 	_initialAmount := big.NewInt(_int64)
 	_tokenAddress, _, _, err := token.DeployHumanStandardToken(txOpt, ether.GetEthClient(), _initialAmount, _name, 10, _symbol)
 	if err != nil {
-		c.String(http.StatusOK, err.Error())
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
 		return
 	}
 
@@ -82,7 +82,7 @@ func DeployToken(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, address)
+	c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": address})
 }
 
 // BalanceOfToken BalanceOfToken
