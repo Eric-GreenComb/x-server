@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/Eric-GreenComb/x-server/bean"
+	"github.com/Eric-GreenComb/x-server/config"
 	"github.com/Eric-GreenComb/x-server/ether"
 	"github.com/Eric-GreenComb/x-server/persist"
 	"github.com/Eric-GreenComb/x-server/token"
@@ -19,6 +20,73 @@ import (
 
 // DeployToken DeployToken
 func DeployToken(c *gin.Context) {
+
+	_userID := c.PostForm("userID")
+
+	_name := c.PostForm("name")
+	_symbol := c.PostForm("symbol")
+	_total := c.PostForm("total")
+	_desc := c.PostForm("desc")
+
+	_int64, err := strconv.ParseInt(_total, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
+		return
+	}
+
+	_addresses, err := persist.GetPersist().ListAddress(_userID)
+	if err != nil || len(_addresses) == 0 {
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": "get user address error"})
+		return
+	}
+
+	fmt.Println(_addresses[0].Address)
+
+	_keystore, err := persist.GetPersist().AddressInfo(_addresses[0].Address)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": "get address error"})
+		return
+	}
+
+	txOpt, err := bind.NewTransactor(strings.NewReader(_keystore.BackStore), config.ServerConfig.Passphrase)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
+		return
+	}
+
+	_initialAmount := big.NewInt(_int64)
+	_tokenAddress, _, _, err := token.DeployHumanStandardToken(txOpt, ether.GetEthClient(), _initialAmount, _name, 10, _symbol)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": err.Error()})
+		return
+	}
+
+	address := fmt.Sprintf("0x%x", _tokenAddress)
+
+	// save token into db
+	var _tokens bean.Tokens
+	_tokens.ESN = "fans"
+	_tokens.Address = address
+	_tokens.Name = _name
+	_tokens.Symbol = _symbol
+	_tokens.Total = _int64
+	_tokens.Desc = _desc
+	_tokens.UserID = _userID
+	_tokens.Owner = _addresses[0].Address
+	_tokens.Weight = 0
+	_tokens.Status = 0
+
+	err = persist.GetPersist().CreateToken(_tokens)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"errcode": 1, "msg": "create token error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"errcode": 0, "msg": address})
+}
+
+// SelfDeployToken SelfDeployToken
+func SelfDeployToken(c *gin.Context) {
 
 	_userID := c.PostForm("userID")
 	_pwd := c.PostForm("pwd")

@@ -76,7 +76,7 @@ curl -s -X POST http://123.206.29.15:4100/api/v1/account/recover/0x12f91a58bf271
 
 - deploy token /token/deploy
 
-curl -s -X POST http://123.206.29.15:4100/api/v1/token/deploy -d 'userID=13810167616&pwd=a11111&name=歌手C&symbol=STC&total=1000000000&desc=歌手C发的Token'
+curl -s -X POST http://123.206.29.15:4100/api/v1/token/deploy -d 'userID=13810167616&pwd=a11111&name=歌手D&symbol=STC&total=1000000000&desc=歌手D发的Token'
 
 return 0x573d52f6547ca177384ad763e4435ce7b566b9f7
 

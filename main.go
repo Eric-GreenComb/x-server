@@ -71,6 +71,7 @@ func main() {
 
 		// ether
 		r1.POST("/token/deploy", handler.DeployToken)
+		r1.POST("/token/selfdeploy", handler.SelfDeployToken)
 		r1.POST("/token/balance/:addr", handler.BalanceOfToken)
 		r1.POST("/token/transfer", handler.TransferToken)
 		// db - token

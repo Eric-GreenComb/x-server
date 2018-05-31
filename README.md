@@ -76,7 +76,7 @@ curl -s -X POST http://123.206.29.15:4100/api/v1/account/recover/0x12f91a58bf271
 
 - deploy token /token/deploy
 
-curl -s -X POST http://localhost:8080/api/v1/token/deploy -d 'userID=13810167616&pwd=a11111&name=歌手C&symbol=STC&total=1000000000&desc=歌手C发的Token'
+curl -s -X POST http://123.206.29.15:4100/api/v1/token/deploy -d 'userID=13810167616&pwd=a11111&name=歌手E&symbol=STE&total=1000000000&desc=歌手E发的Token'
 
 return 0x573d52f6547ca177384ad763e4435ce7b566b9f7
 
@@ -132,7 +132,7 @@ curl http://localhost:8080/api/v1/token/list/138/1
 
 - /view/create/:userid/:address/:tokenaddress
 
-curl -s -X POST http://123.206.29.15:4100/api/v1/view/create/13810167616/0x12f91a58bf2714ec602f3c3b9841Ddf98478DFF0/0x13e55998e931687c1a19d6281d58fb3622e5c6fc
+curl -s -X POST http://123.206.29.15:4100/api/v1/view/create/13810167616/0x12f91a58bf2714ec602f3c3b9841Ddf98478DFF0/0xd9a5883d56ce1cd11dd0c294c9d6daa261267a25
 
 - /view/delete/:userid/:address/:tokenaddress
 
