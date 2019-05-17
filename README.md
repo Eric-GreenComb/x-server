@@ -132,7 +132,7 @@ curl -s -X POST http://123.206.29.15:4100/api/v1/token/weight/0x1dd80b503e3b5de5
 
 - ListToken /token/list/:search/:page
 
-curl http://localhost:5100/api/v1/token/list//1
+curl http://47.89.15.157:13500/api/v1/token/list//1
 
 ## view
 
