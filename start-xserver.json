@@ -1,0 +1,15 @@
+{
+    "apps": [{
+        "name": "xserver",
+        "cwd": "./",
+        "script": "start-xserver.sh",
+        "exec_interpreter": "bash",
+        "min_uptime": "60s",
+        "max_restarts": 30,
+        "exec_mode": "fork",
+        "error_file": "./tmp/err.log",
+        "out_file": "./tmp/out.log",
+        "pid_file": "./tmp/linked.pid",
+        "watch": false
+    }]
+}

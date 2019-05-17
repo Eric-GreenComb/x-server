@@ -4,7 +4,7 @@
 #
 ###############################################################################
 server:
-  port: 8080,8081,8082,8083
+  port: 13500
   mode: debug  # debug;release
   gorm:
     LogMode: false # db log

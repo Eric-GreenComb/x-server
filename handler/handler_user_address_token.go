@@ -119,7 +119,7 @@ func ListUserAddressTokenBanlance(c *gin.Context) {
 			fmt.Println("Caller Error : " + err.Error())
 			continue
 		}
-		_bigint, err := _caller.BalanceOf(&bind.CallOpts{Pending: true}, common.HexToAddress(_address))
+		_bigint, err := _caller.BalanceOf(&bind.CallOpts{Pending: false}, common.HexToAddress(_address))
 		if err != nil {
 			fmt.Println("BalanceOf Error : " + err.Error())
 			continue

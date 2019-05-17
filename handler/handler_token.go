@@ -169,7 +169,7 @@ func BalanceOfToken(c *gin.Context) {
 			fmt.Println("Caller Error : " + err.Error())
 			continue
 		}
-		_bigint, err := _caller.BalanceOf(&bind.CallOpts{Pending: true}, common.HexToAddress(_addr))
+		_bigint, err := _caller.BalanceOf(&bind.CallOpts{Pending: false}, common.HexToAddress(_addr))
 		if err != nil {
 			fmt.Println("BalanceOf Error : " + err.Error())
 			continue
@@ -205,7 +205,7 @@ func TransferToken(c *gin.Context) {
 	if err != nil {
 		fmt.Println("Caller Error : " + err.Error())
 	}
-	_nBalance, err := _caller.BalanceOf(&bind.CallOpts{Pending: true}, common.HexToAddress(_from))
+	_nBalance, err := _caller.BalanceOf(&bind.CallOpts{Pending: false}, common.HexToAddress(_from))
 	if err != nil {
 		fmt.Println("BalanceOf Error : " + err.Error())
 	}
